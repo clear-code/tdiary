@@ -96,12 +96,13 @@ module HTMLArchiver
 		end
 
 		def save
-			return unless can_save?
+			return false unless can_save?
 			filename = output_filename
 			if !filename.exist? or filename.mtime != last_modified
 				filename.open('w') {|f| f.print(normalize_output(eval_rhtml))}
 				filename.utime(last_modified, last_modified)
 			end
+			true
 		end
 
 		protected
@@ -146,7 +147,8 @@ module HTMLArchiver
 				end
 
 				def category_anchor(category)
-					href = "category/\#{u category}.html"
+					normalized_category = ::HTMLArchiver::Category.normalize_name(category)
+					href = "category/\#{u normalized_category}.html"
 					if @category_icon[category] and !@conf.mobile_agent?
 						%Q|<a href="\#{href}"><img class="category" src="\#{h @category_icon_url}\#{h @category_icon[category]}" alt="\#{h category}"></a>|
 					else
@@ -277,6 +279,12 @@ EOH
 	class Category < TDiary::TDiaryView
 		include Base
 
+		class << self
+			def normalize_name(name)
+				name.downcase.gsub(/[ _]/, "-")
+			end
+		end
+
 		def initialize(category, diaries, dest, conf)
 			@category = category
 			diaries = diaries.reject {|date, diary| !diary.visible?}
@@ -291,10 +299,22 @@ EOH
 			not @diary.nil?
 		end
 
-		def output_filename
+		def output_directory
 			category_dir = @dest + "category"
 			category_dir.mkpath
-			category_dir + "#{@category}.html"
+			category_dir
+		end
+
+		def output_filename
+			output_directory + "#{normalized_name}.html"
+		end
+
+		def original_name
+			@category
+		end
+
+		def normalized_name
+			self.class.normalize_name(@category)
 		end
 
 		def relative_path
@@ -561,10 +581,11 @@ EOH
 		end
 
 		def archive_categories
+			categories = []
 			cache = @plugin.instance_variable_get("@category_cache")
 			cache.recreate(@years)
-			cache.categorize([], @years).each do |category, diaries|
-				next if category.empty?
+			cache.categorize([], @years).each do |name, diaries|
+				next if name.empty?
 				categorized_diaries = {}
 				diaries.keys.each do |date|
 					date_time = Time.local(*date.scan(/^(\d{4})(\d\d)(\d\d)$/)[0])
@@ -573,7 +594,21 @@ EOH
 						DIRTY_NONE
 					end
 				end
- 				Category.new(category, categorized_diaries, @dest, conf).save
+				category = Category.new(name, categorized_diaries, @dest, conf)
+ 				categories << category if category.save
+			end
+
+			return if categories.empty?
+			htaccess = categories.first.output_directory + ".htaccess"
+			htaccess.open("w") do |f|
+				categories.each do |category|
+					original_name_page = "#{category.original_name}.html"
+					normalized_name_page = "#{category.normalized_name}.html"
+					next if original_name_page == normalized_name_page
+					f.puts("RedirectMatch permanent " +
+							 "\"(.*)/#{Regexp.escape(original_name_page)}$\" " +
+							 "\"$1/#{normalized_name_page}\"")
+				end
 			end
 		end
 

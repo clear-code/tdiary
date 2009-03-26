@@ -147,7 +147,7 @@ module HTMLArchiver
 				end
 
 				def category_anchor(category)
-					normalized_category = ::HTMLArchiver::Category.normalize_name(category)
+					normalized_category = ::HTMLArchiver::Category.normalize_name(@conf, category)
 					href = "category/\#{u normalized_category}.html"
 					if @category_icon[category] and !@conf.mobile_agent?
 						%Q|<a href="\#{href}"><img class="category" src="\#{h @category_icon_url}\#{h @category_icon[category]}" alt="\#{h category}"></a>|
@@ -280,8 +280,9 @@ EOH
 		include Base
 
 		class << self
-			def normalize_name(name)
-				name.downcase.gsub(/[ _]/, "-")
+			def normalize_name(conf, name)
+				table = conf["html_archiver.category.normalize_table"] || {}
+				table[name] || name.downcase.gsub(/[ _]/, "-")
 			end
 		end
 
@@ -314,7 +315,7 @@ EOH
 		end
 
 		def normalized_name
-			self.class.normalize_name(@category)
+			self.class.normalize_name(@conf, @category)
 		end
 
 		def relative_path

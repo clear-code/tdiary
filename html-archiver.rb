@@ -523,6 +523,7 @@ EOH
 		end
 
 		def normalize_last_modified(last_modified)
+			return last_modified if (1..22).include?(Time.now.hour)
 			next_day = last_modified + 60 * 60 * 24
 			seconds, minutes, hours, *others = next_day.to_a
 			if last_modified.utc?

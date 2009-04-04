@@ -270,7 +270,6 @@ EOH
 			@target_date.month.to_s
 		end
 
-		private
 		def setup_cgi(cgi, conf)
 			super
 			cgi.params["date"] = [@target_date.strftime("%Y%m")]
@@ -328,6 +327,16 @@ EOH
 				diary = @diaries[date]
 				yield(diary)
 			end
+		end
+
+		def load_plugins
+			result = super
+			@plugin.instance_eval(<<-EOS, __FILE__, __LINE__ + 1)
+				def title_tag
+					"<title>#{h( original_name )} - #{h( @conf.html_title )}</title>"
+				end
+			EOS
+			result
 		end
 
 		protected
@@ -676,7 +685,10 @@ EOH
 end
 
 cgi = HTMLArchiver::CGI.new
-conf = TDiary::Config.new(cgi)
+conf = nil
+Dir.chdir(options.conf_dir) do
+	conf = TDiary::Config.new(cgi)
+end
 conf.show_comment = true
 conf.hide_comment_form = true
 def conf.bot?; false; end

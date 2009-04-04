@@ -36,7 +36,8 @@ opts = OptionParser.new do |opts|
 		options.tdiary_path = path
 	end
 
-	opts.on("-c", "--conf=TDIARY_CONF", "a path of tdiary.conf") do |conf|
+	opts.on("-c", "--conf=TDIARY_CONF_DIRECTORY",
+			  "a directory that has tdiary.conf") do |conf|
 		options.conf_dir = conf
 	end
 end

@@ -657,7 +657,10 @@ EOH
 			theme_dir.rmtree if theme_dir.exist?
 			theme_dir.mkpath
 			tdiary_theme_dir = Pathname(File.join(TDiary::PATH, "theme"))
-			FileUtils.cp((tdiary_theme_dir + "base.css").to_s, theme_dir.to_s)
+			base_css = tdiary_theme_dir + "base.css"
+			dest_base_css = theme_dir + "base.css"
+			FileUtils.cp(base_css.to_s, dest_base_css.to_s)
+			FileUtils.touch(dest_base_css.to_s, :mtime => base_css.mtime)
 			if @conf.theme
 				copy_recursive(tdiary_theme_dir + @conf.theme,
 									theme_dir + @conf.theme)

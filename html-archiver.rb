@@ -193,9 +193,13 @@ module HTMLArchiver
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="#{lang}" lang="#{lang}">
 EOH
 			end
-			xhtml.gsub(/<((?:meta|link|img|br|hr)\b.*?)>/) do
+			xhtml.gsub(/<((?:meta|link|img|br|hr)\b.*?)>/) do |matched|
 				content = $1
-				"<#{content} />"
+				if /\/\z/ =~ content
+					matched
+				else
+					"<#{content} />"
+				end
 			end
 		end
 	end

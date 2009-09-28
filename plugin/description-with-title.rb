@@ -16,7 +16,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 def description_tag
-	description = @conf.description || ''
 	if @mode == "day"
 		_date = @date.strftime("%Y%m%d")
 		diaries = [@diaries.find {|date, diary| _date == date}].compact
@@ -35,9 +34,11 @@ def description_tag
 	end.reject do |string|
 		string.empty?
 	end.join(", ")
-	description = [description, diary_titles].reject do |string|
+
+	description = [@conf.description || '', diary_titles].reject do |string|
 		string.empty?
 	end.join(": ")
+
 	if description.empty?
 		""
 	else

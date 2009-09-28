@@ -88,7 +88,7 @@ module HTMLArchiver
 		def eval_rhtml(*args)
 			fix_link(super) do |link_attribute, prefix, link|
 				uri = URI(link)
-				if uri.absolute? or link[0] == ?/
+				if uri.absolute? or link[0] == ?/ or link[0] == ?#
 					link_attribute
 				else
 					%Q[#{prefix}="#{relative_path}#{link}"]
@@ -513,7 +513,7 @@ EOH
 			host_uri = host_uri.to_s
 			fix_link(body) do |link_attribute, prefix, link|
 				uri = URI(link)
-				if uri.absolute?
+				if uri.absolute? or link[0] == ?#
 					link_attribute
 				else
 					if link[0] == ?/

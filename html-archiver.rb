@@ -454,7 +454,9 @@ EOH
 			channel.about = rss_uri
 			channel.link = base_uri
 			channel.title = @conf.html_title
-			channel.description = @conf.description
+			description = @conf["html_archiver.rss.description"]
+			description ||= @conf.description
+			channel.description = description unless description.to_s.empty?
 			channel.dc_creator = @conf.author_name
 			channel.dc_rights = @conf.copyright
 		end

@@ -202,6 +202,11 @@ EOH
 				end
 			end
 		end
+
+		def set_last_modified?
+			set_last_modified = @conf["html_archiver.set_last_modified"]
+			set_last_modified.nil? or set_last_modified
+		end
 	end
 
 	class Day < TDiary::TDiaryDay
@@ -242,11 +247,6 @@ EOH
 		def setup_cgi(cgi, conf)
 			super
 			cgi.params["date"] = [@target_date.strftime("%Y%m%d")]
-		end
-
-		def set_last_modified?
-			set_last_modified = @conf["html_archiver.set_last_modified"]
-			set_last_modified.nil? or set_last_modified
 		end
 	end
 
@@ -601,6 +601,10 @@ EOH
 				end
 			end
 			all_days
+rescue Exception
+	p $!
+	puts $@
+	raise
 		end
 
 		def archive_categories

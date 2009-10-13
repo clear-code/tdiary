@@ -101,7 +101,7 @@ module HTMLArchiver
 			filename = output_filename
 			if !filename.exist? or filename.mtime != last_modified
 				filename.open('w') {|f| f.print(normalize_output(eval_rhtml))}
-				filename.utime(last_modified, last_modified)
+				filename.utime(last_modified, last_modified) if set_last_modified?
 			end
 			true
 		end
@@ -242,6 +242,11 @@ EOH
 		def setup_cgi(cgi, conf)
 			super
 			cgi.params["date"] = [@target_date.strftime("%Y%m%d")]
+		end
+
+		def set_last_modified?
+			set_last_modified = @conf["html_archiver.set_last_modified"]
+			set_last_modified.nil? or set_last_modified
 		end
 	end
 

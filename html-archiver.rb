@@ -601,10 +601,6 @@ EOH
 				end
 			end
 			all_days
-rescue Exception
-	p $!
-	puts $@
-	raise
 		end
 
 		def archive_categories

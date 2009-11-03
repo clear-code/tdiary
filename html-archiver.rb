@@ -87,8 +87,14 @@ module HTMLArchiver
 
 		def eval_rhtml(*args)
 			fix_link(super) do |link_attribute, prefix, link|
-				uri = URI(link)
-				if uri.absolute? or link[0] == ?/ or link[0] == ?#
+				uri = nil
+				begin
+					uri = URI(link)
+				rescue URI::Error
+					puts "#{$!.class}: #{$!.message}"
+					puts $@
+				end
+				if uri.nil? or uri.absolute? or link[0] == ?/ or link[0] == ?#
 					link_attribute
 				else
 					%Q[#{prefix}="#{relative_path}#{link}"]

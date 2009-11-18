@@ -154,8 +154,7 @@ module HTMLArchiver
 				end
 
 				def category_anchor(category)
-					normalized_category = ::HTMLArchiver::Category.normalize_name(@conf, category)
-					href = "category/\#{u normalized_category}.html"
+					href = ::HTMLArchiver::Category.path(@conf, category)
 					if @category_icon[category] and !@conf.mobile_agent?
 						%Q|<a href="\#{href}"><img class="category" src="\#{h @category_icon_url}\#{h @category_icon[category]}" alt="\#{h category}"></a>|
 					else
@@ -299,11 +298,20 @@ EOH
 				table = conf["html_archiver.category.normalize_table"] || {}
 				table[name] || name.downcase.gsub(/[ _]/, "-")
 			end
+
+			def path(conf, name)
+				normalized_category = normalize_name(conf, name)
+				"#{directory_name}/#{ERB::Util.u normalized_category}.html"
+			end
+
+			def directory_name
+				"category"
+			end
 		end
 
 		def initialize(category, diaries, dest, conf)
 			@category = category
-			diaries = diaries.reject {|date, diary| !diary.visible?}
+			diaries = diaries.reject {|date, diary| diary.nil? or !diary.visible?}
 			_, diary = diaries.sort_by {|date, diary| diary.last_modified}.last
 			@target_date = diary.date
 			super("latest.rhtml", dest, conf)
@@ -316,7 +324,7 @@ EOH
 		end
 
 		def output_directory
-			category_dir = @dest + "category"
+			category_dir = @dest + self.class.directory_name
 			category_dir.mkpath
 			category_dir
 		end
@@ -516,6 +524,8 @@ EOH
 				item.dc_subjects.new_subject do |subject|
 					subject.content = category
 				end
+				category_path = Category.path(@conf, category)
+				item.taxo_topics.resources << base_uri + category_path
 			end
 		end
 

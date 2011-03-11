@@ -15,8 +15,10 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-alias permalink_with_section_id permalink
-def permalink(date, index, escape=true)
-	original_permalink = permalink_with_section_id(date, index, false)
-	original_permalink.gsub(/#p\d+\z/, '')
+if defined?(permalink)
+	alias permalink_with_section_id permalink
+	def permalink(date, index, escape=true)
+		original_permalink = permalink_with_section_id(date, index, false)
+		original_permalink.gsub(/#p\d+\z/, '')
+	end
 end

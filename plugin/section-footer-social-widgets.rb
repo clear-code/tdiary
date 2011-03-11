@@ -53,7 +53,6 @@ add_section_leave_proc do |date, index|
 	widgets << <<-HATENA
 <a href="http://b.hatena.ne.jp/entry/#{url}"
    class="hatena-bookmark-button"
-   data-hatena-bookmark-title="#{h(subtitle(date, index))}"
    data-hatena-bookmark-layout="standard"
    title="このエントリーをはてなブックマークに追加"
    ><img src="http://b.st-hatena.com/images/entry-button/button-only.gif"
@@ -66,8 +65,7 @@ HATENA
 <a href="http://twitter.com/share"
    class="twitter-share-button"
    data-lang="ja"
-   data-url="#{url}"
-   data-text="#{h(subtitle(date, index))}">ツイートする</a>
+   data-url="#{url}">ツイートする</a>
 TWITTER
 	widgets << "  </div>\n"
 	widgets << <<-FACEBOOK_LIKE

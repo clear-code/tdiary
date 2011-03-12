@@ -46,8 +46,22 @@ unless @conf.header.include?(fb_root)
 	@conf.header << fb_root
 end
 
+add_section_enter_proc do |date, index|
+	@subtitles = {date => {}}
+	''
+end
+
+subtitle_proc = Proc.new do |date, index, subtitle|
+	@subtitles[date][index] = subtitle.gsub(/(?:\[.*?\])/, '').strip
+	""
+end
+@subtitle_procs.unshift(subtitle_proc)
+
 add_section_leave_proc do |date, index|
-	url = "#{@conf.base_url}#{anchor(date.strftime('%Y%m%d'))}"
+	date_ymd = date.strftime('%Y%m%d')
+	url = h("#{@conf.base_url}#{anchor(date_ymd)}")
+	subtitle = @subtitles[date][index]
+	entry_title = h("#{subtitle} - #{@html_title}(#{date_ymd})")
 	widgets = "<div class=\"social-widgets\">\n"
 	widgets << "  <div class=\"inline-social-widgets\">\n"
 	widgets << <<-HATENA
@@ -65,7 +79,8 @@ HATENA
 <a href="http://twitter.com/share"
    class="twitter-share-button"
    data-lang="ja"
-   data-url="#{url}">ツイートする</a>
+   data-url="#{url}"
+   data-text="#{entry_title}">ツイートする</a>
 TWITTER
 	widgets << "  </div>\n"
 	widgets << <<-FACEBOOK_LIKE

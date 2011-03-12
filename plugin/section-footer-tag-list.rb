@@ -21,7 +21,6 @@ add_section_enter_proc do |date, index|
 end
 
 subtitle_proc = Proc.new do |date, index, subtitle|
-	File.open("/tmp/log", "a") {|x| x.puts(subtitle.inspect) }
 	if subtitle then
 		subtitle.sub( /^(?:\[[^\[]+?\])+/ ) do
 			$&.scan( /\[(.*?)\]/ ) do |tag|

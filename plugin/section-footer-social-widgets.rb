@@ -53,7 +53,7 @@ end
 
 subtitle_proc = Proc.new do |date, index, subtitle|
 	@subtitles[date][index] = subtitle.gsub(/(?:\[.*?\])/, '').strip
-	""
+	subtitle
 end
 @subtitle_procs.unshift(subtitle_proc)
 

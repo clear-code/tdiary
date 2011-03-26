@@ -25,6 +25,9 @@ add_header_proc do
           src="http://b.st-hatena.com/js/bookmark_button.js"
           charset="utf-8"
           async="async"></script>
+  <script type="text/javascript"
+          src="http://b.hatena.ne.jp/js/widget.js"
+          charset="utf-8"></script>
   <script src="http://platform.twitter.com/widgets.js"
           type="text/javascript"></script>
   <script src="http://connect.facebook.net/ja_JP/all.js"></script>

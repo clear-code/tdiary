@@ -177,7 +177,7 @@ module HTMLArchiver
 		end
 
 		def fix_link(html)
-			link_detect_re = /(<(?:a|link|script)\b.*?\bhref|<img\b.*?\bsrc)="(.*?)"/
+			link_detect_re = /(<(?:a|link)\b.*?\bhref|<(?:img|script)\b.*?\bsrc)="(.*?)"/
 			html.gsub(link_detect_re) do |link_attribute|
 				prefix = $1
 				link = $2

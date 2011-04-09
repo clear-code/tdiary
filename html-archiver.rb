@@ -588,6 +588,7 @@ EOH
 
  			make_rss
 			copy_theme
+			copy_js
 		end
 
 		private
@@ -693,6 +694,14 @@ EOH
 				copy_recursive(tdiary_theme_dir + @conf.theme,
 									theme_dir + @conf.theme)
 			end
+		end
+
+		def copy_js
+			js_dir = @dest + "js"
+			js_dir.rmtree if js_dir.exist?
+			js_dir.mkpath
+			tdiary_js_dir = Pathname(File.join(TDiary::PATH, "js"))
+			copy_recursive(tdiary_js_dir, js_dir)
 		end
 
 		def copy_recursive(source, destination)

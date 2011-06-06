@@ -70,6 +70,9 @@ add_section_leave_proc do |date, index|
 	entry_title = h("#{subtitle} - #{@html_title}(#{date_ymd})")
 	widgets = "<div class=\"social-widgets\">\n"
 	widgets << "  <div class=\"inline-social-widgets\">\n"
+	widgets << <<-GOOGLE_PLUSONE
+<g:plusone href="#{url}" size="medium"></g:plusone>
+GOOGLE_PLUSONE
 	widgets << <<-HATENA
 <a href="http://b.hatena.ne.jp/entry/#{url}"
    class="hatena-bookmark-button"
@@ -88,9 +91,6 @@ HATENA
    data-url="#{url}"
    data-text="#{entry_title}">ツイートする</a>
 TWITTER
-	widgets << <<-GOOGLE_PLUSONE
-<g:plusone href="#{url}" size="medium"></g:plusone>
-GOOGLE_PLUSONE
 	widgets << "  </div>\n"
 	widgets << <<-FACEBOOK_LIKE
 <fb:like layout="standard"

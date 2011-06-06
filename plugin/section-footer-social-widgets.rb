@@ -41,6 +41,9 @@ add_header_proc do
 	 });
   };
   </script>
+  <script type="text/javascript" src="http://apis.google.com/js/plusone.js">
+    {lang: 'ja'}
+  </script>
    HTML
 end
 
@@ -85,6 +88,9 @@ HATENA
    data-url="#{url}"
    data-text="#{entry_title}">ツイートする</a>
 TWITTER
+	widgets << <<-GOOGLE_PLUSONE
+<g:plusone href="#{url}" size="medium"></g:plusone>
+GOOGLE_PLUSONE
 	widgets << "  </div>\n"
 	widgets << <<-FACEBOOK_LIKE
 <fb:like layout="standard"

@@ -1,3 +1,5 @@
+require 'tdiary/io/base'
+
 module TDiary
 	class IOBase
 		def load_styles_with_customizable_path

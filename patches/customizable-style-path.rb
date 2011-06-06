@@ -1,7 +1,5 @@
-require 'tdiary/io/base'
-
 module TDiary
-	class IOBase
+	class BaseIO
 		def load_styles_with_customizable_path
 			load_styles_without_customizable_path
 			paths = @tdiary.conf.options['style.path'] || []

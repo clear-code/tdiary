@@ -725,11 +725,13 @@ end
 cgi = HTMLArchiver::CGI.new
 conf = nil
 Dir.chdir(options.conf_dir) do
-	original_program_name = $PROGRAM_NAME
-	$PROGRAM_NAME = File.basename($PROGRAM_NAME)
-	conf = TDiary::Config.new(cgi)
-ensure
-	$PROGRAM_NAME = original_program_name
+	begin
+		original_program_name = $PROGRAM_NAME
+		$PROGRAM_NAME = File.basename($PROGRAM_NAME)
+		conf = TDiary::Config.new(cgi)
+	ensure
+		$PROGRAM_NAME = original_program_name
+	end
 end
 conf.show_comment = true
 conf.hide_comment_form = true

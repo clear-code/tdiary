@@ -84,17 +84,21 @@ GOOGLE_PLUSONE
          style="border: none;"
          alt="このエントリーをはてなブックマークに追加" /></a>
 HATENA
-	widgets << <<-TWITTER
+	widgets << <<-TWITTER_SHARE
 <a href="http://twitter.com/share"
    class="twitter-share-button"
    data-lang="ja"
    data-url="#{url}"
    data-text="#{entry_title}">ツイートする</a>
-<a href="http://twitter.com/_clear_code"
-   class="twitter-follow-button"
-   data-lang="ja">フォローする</a>
-TWITTER
+TWITTER_SHARE
 	widgets << "  </div>\n"
+	widgets << <<-TWITTER_FOLLOW
+<div class="social-widget-twitter-follow">
+  <a href="http://twitter.com/_clear_code"
+	  class="twitter-follow-button"
+	  data-lang="ja">フォローする</a>
+</div>
+TWITTER_FOLLOW
 	widgets << <<-FACEBOOK_LIKE
 <fb:like layout="standard"
          width="#{@conf["social_widgets.facebook_like_width"]}"

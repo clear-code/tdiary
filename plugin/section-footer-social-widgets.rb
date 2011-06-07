@@ -90,6 +90,9 @@ HATENA
    data-lang="ja"
    data-url="#{url}"
    data-text="#{entry_title}">ツイートする</a>
+<a href="http://twitter.com/_clear_code"
+   class="twitter-follow-button"
+   data-lang="ja">フォローする</a>
 TWITTER
 	widgets << "  </div>\n"
 	widgets << <<-FACEBOOK_LIKE

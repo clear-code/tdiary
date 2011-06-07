@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 # -*- coding: utf-8; ruby-indent-level: 3; tab-width: 3; indent-tabs-mode: t -*-
 #
-# Copyright (C) 2008-2009  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2008-2011  Kouhei Sutou <kou@clear-code.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -45,10 +45,8 @@ opts.parse!
 
 output_dir = ARGV.shift
 
-Dir.chdir(options.conf_dir) do
-	$LOAD_PATH.unshift(File.expand_path(options.tdiary_path))
-	require "tdiary"
-end
+$LOAD_PATH.unshift(File.expand_path(options.tdiary_path))
+require "tdiary"
 
 module HTMLArchiver
 	class CGI < ::CGI
@@ -727,7 +725,11 @@ end
 cgi = HTMLArchiver::CGI.new
 conf = nil
 Dir.chdir(options.conf_dir) do
+	original_program_name = $PROGRAM_NAME
+	$PROGRAM_NAME = File.basename($PROGRAM_NAME)
 	conf = TDiary::Config.new(cgi)
+ensure
+	$PROGRAM_NAME = original_program_name
 end
 conf.show_comment = true
 conf.hide_comment_form = true

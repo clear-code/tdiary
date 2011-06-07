@@ -21,6 +21,11 @@ add_header_proc do
         content="#{h(@conf['social_widgets.facebook_user_id'])}" />
   <meta property="fb:app_id"
         content="#{h(@conf['social_widgets.facebook_application_id'])}" />
+	HTML
+end
+
+add_footer_proc do
+	<<-HTML
   <script type="text/javascript"
           src="http://b.st-hatena.com/js/bookmark_button.js"
           charset="utf-8"

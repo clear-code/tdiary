@@ -24,7 +24,7 @@ add_header_proc do
 	HTML
 end
 
-add_footer_proc do
+def section_footer_social_widgets_footer_scripts
 	<<-HTML
   <script type="text/javascript"
           src="http://b.st-hatena.com/js/bookmark_button.js"

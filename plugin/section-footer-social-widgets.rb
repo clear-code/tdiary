@@ -94,12 +94,13 @@ HATENA
    class="twitter-share-button"
    data-lang="ja"
    data-url="#{url}"
+   data-via="#{h(@conf['social_widgets.twitter_id'])}"
    data-text="#{entry_title}">ツイートする</a>
 TWITTER_SHARE
 	widgets << "  </div>\n"
 	widgets << <<-TWITTER_FOLLOW
 <div class="social-widget-twitter-follow">
-  <a href="http://twitter.com/_clear_code"
+  <a href="http://twitter.com/#{h(@conf['social_widgets.twitter_id'])}"
 	  class="twitter-follow-button"
 	  data-lang="ja">フォローする</a>
 </div>

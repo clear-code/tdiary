@@ -37,14 +37,12 @@ def section_footer_social_widgets_footer_scripts
           type="text/javascript"></script>
   <script src="http://connect.facebook.net/ja_JP/all.js"></script>
   <script>
-  window.fbAsyncInit = function() {
 	 FB.init({
 		appId  : '#{h(@conf['social_widgets.facebook_application_id'])}',
 		status : true, // check login status
 		cookie : true, // enable cookies to allow the server to access the session
 		xfbml  : true  // parse XFBML
 	 });
-  };
   </script>
   <script type="text/javascript" src="http://apis.google.com/js/plusone.js">
     {lang: 'ja'}

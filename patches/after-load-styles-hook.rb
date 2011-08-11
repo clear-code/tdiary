@@ -16,6 +16,7 @@
 module TDiary
 	class BaseIO
 		@@after_load_styles_hooks = []
+		@@loaded_styles = false
 		class << self
 			def after_load_styles( block = Proc::new )
 				@@after_load_styles_hooks << block
@@ -24,9 +25,11 @@ module TDiary
 
 		def load_styles_with_after_hook
 			load_styles_without_after_hook
+			return if @@loaded_styles
 			@@after_load_styles_hooks.each do |hook|
 				hook.call(self)
 			end
+			@@loaded_styles = true
 		end
 		alias_method :load_styles_without_after_hook, :load_styles
 		alias_method :load_styles, :load_styles_with_after_hook

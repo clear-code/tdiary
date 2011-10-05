@@ -70,7 +70,8 @@ add_section_leave_proc do |date, index|
 	date_ymd = date.strftime('%Y%m%d')
 	url = h("#{@conf.base_url}#{anchor(date_ymd)}")
 	subtitle = @subtitles[date][index]
-	entry_title = h("#{subtitle} - #{@html_title}(#{date_ymd})")
+	date_label = date.strftime('%Y-%m-%d')
+	entry_title = h("#{subtitle} - #{@html_title}(#{date_label})")
 	widgets = "<div class=\"social-widgets\">\n"
 	widgets << "  <div class=\"inline-social-widgets\">\n"
 	widgets << <<-GOOGLE_PLUSONE

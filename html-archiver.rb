@@ -184,25 +184,16 @@ module HTMLArchiver
 		end
 
 		def normalize_output(output)
-			html_to_xhtml(output)
+			html_to_html5(output)
 		end
 
-		def html_to_xhtml(html)
-			xhtml = html.sub(/\A<!DOCTYPE.+?>\n<html lang="(.+?)">\n/) do
+		def html_to_html5(html)
+			html5 = html.sub(/\A<!DOCTYPE.+?>\n<html lang="(.+?)">\n/) do
 				lang = $1
 				<<-EOH
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="#{lang}" lang="#{lang}">
+<!doctype html>
+<html lang="#{lang}">
 EOH
-			end
-			xhtml.gsub(/<((?:meta|link|img|br|hr)\b.*?)>/) do |matched|
-				content = $1
-				if /\/\z/ =~ content
-					matched
-				else
-					"<#{content} />"
-				end
 			end
 		end
 

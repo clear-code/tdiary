@@ -35,15 +35,6 @@ def section_footer_social_widgets_footer_scripts
           charset="utf-8"></script>
   <script src="http://platform.twitter.com/widgets.js"
           type="text/javascript"></script>
-  <script src="http://connect.facebook.net/ja_JP/all.js"></script>
-  <script>
-	 FB.init({
-		appId  : '#{h(@conf['social_widgets.facebook_application_id'])}',
-		status : true, // check login status
-		cookie : true, // enable cookies to allow the server to access the session
-		xfbml  : true  // parse XFBML
-	 });
-  </script>
   <script type="text/javascript" src="http://apis.google.com/js/plusone.js">
     {lang: 'ja'}
   </script>
@@ -53,6 +44,15 @@ end
 fb_root = '<div id="fb-root"></div>'
 unless @conf.header.include?(fb_root)
 	@conf.header << fb_root
+	@conf.header <<-END_OF_FB_JS_SDK
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/ja_JP/all.js#xfbml=1&appId=#{h(@conf['social_widgets.facebook_application_id'])}";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+END_OF_FB_JS_SDK
 end
 
 add_section_enter_proc do |date, index|
@@ -105,13 +105,16 @@ TWITTER_SHARE
 </div>
 TWITTER_FOLLOW
 	widgets << <<-FACEBOOK_LIKE
-<fb:like layout="standard"
-         width="#{@conf["social_widgets.facebook_like_width"]}"
-         href="#{url}"></fb:like>
+<div class="fb-like"
+     data-send="true"
+     data-href="#{url}"
+     data-width="#{@conf["social_widgets.facebook_like_width"]}"
+     data-show-faces="true"></div>
 FACEBOOK_LIKE
 	widgets << <<-FACEBOOK_COMMENTS
-<fb:comments href="#{url}"
-             width="#{@conf["social_widgets.facebook_comments_width"]}"></fb:comments>
+<div class="fb-comments"
+     data-href="#{url}"
+     data-width="#{@conf["social_widgets.facebook_comments_width"]}"></div>
 FACEBOOK_COMMENTS
 	widgets << "</div>\n"
 	widgets

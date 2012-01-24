@@ -43,8 +43,8 @@ end
 
 fb_root = '<div id="fb-root"></div>'
 unless @conf.header.include?(fb_root)
-	@conf.header << fb_root
-	@conf.header <<-END_OF_FB_JS_SDK
+	fb_header = <<-END_OF_FB_JS_SDK
+#{fb_root}
 <script>(function(d, s, id) {
   var js, fjs = d.getElementsByTagName(s)[0];
   if (d.getElementById(id)) return;
@@ -53,6 +53,7 @@ unless @conf.header.include?(fb_root)
   fjs.parentNode.insertBefore(js, fjs);
 }(document, 'script', 'facebook-jssdk'));</script>
 END_OF_FB_JS_SDK
+	@conf.header = "#{fb_header}\n#{@conf.header}"
 end
 
 add_section_enter_proc do |date, index|

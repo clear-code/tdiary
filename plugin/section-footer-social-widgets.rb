@@ -106,16 +106,20 @@ TWITTER_SHARE
 </div>
 TWITTER_FOLLOW
 	widgets << <<-FACEBOOK_LIKE
-<div class="fb-like"
-     data-send="true"
-     data-href="#{url}"
-     data-width="#{@conf["social_widgets.facebook_like_width"]}"
-     data-show-faces="true"></div>
+<div class="social-widget-facebook">
+  <div class="fb-like"
+		 data-send="true"
+		 data-href="#{url}"
+		 data-width="#{@conf["social_widgets.facebook_like_width"]}"
+		 data-show-faces="true"></div>
+</div>
 FACEBOOK_LIKE
 	widgets << <<-FACEBOOK_COMMENTS
-<div class="fb-comments"
-     data-href="#{url}"
-     data-width="#{@conf["social_widgets.facebook_comments_width"]}"></div>
+<div class="social-widget-facebook">
+  <div class="fb-comments"
+		 data-href="#{url}"
+		 data-width="#{@conf["social_widgets.facebook_comments_width"]}"></div>
+</div>
 FACEBOOK_COMMENTS
 	widgets << "</div>\n"
 	widgets

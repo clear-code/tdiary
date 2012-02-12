@@ -16,12 +16,23 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 add_header_proc do
-	<<-HTML
+	tags = ""
+  if @conf['social_widgets.facebook_user_id']
+    tags << <<-HTML
   <meta property="fb:admins"
         content="#{h(@conf['social_widgets.facebook_user_id'])}" />
-  <meta property="fb:app_id"
-        content="#{h(@conf['social_widgets.facebook_application_id'])}" />
+	  HTML
+  end
+  if @conf['social_widgets.facebook_application_id']
+    tags << <<-HTML
+    <meta property="fb:app_id"
+          content="#{h(@conf['social_widgets.facebook_application_id'])}" />
+	  HTML
+  end
+  tags << <<-HTML
+  <meta property="og:locale" content="ja_JP" />
 	HTML
+  tags
 end
 
 def section_footer_social_widgets_footer_scripts
@@ -43,13 +54,21 @@ end
 
 fb_root = '<div id="fb-root"></div>'
 unless @conf.header.include?(fb_root)
+  options = {"xfbml" => 1}
+  if @conf['social_widgets.facebook_application_id']
+    options = {"appId" => @conf['social_widgets.facebook_application_id']}
+  end
+  escaped_options = options.collect do |key, value|
+    "#{key}=#{h(value)}"
+  end
+  options_in_url = escaped_options.join("&")
 	fb_header = <<-END_OF_FB_JS_SDK
 #{fb_root}
 <script>(function(d, s, id) {
   var js, fjs = d.getElementsByTagName(s)[0];
   if (d.getElementById(id)) return;
   js = d.createElement(s); js.id = id;
-  js.src = "//connect.facebook.net/ja_JP/all.js#xfbml=1&appId=#{h(@conf['social_widgets.facebook_application_id'])}";
+  js.src = "//connect.facebook.net/ja_JP/all.js\##{options_in_url}";
   fjs.parentNode.insertBefore(js, fjs);
 }(document, 'script', 'facebook-jssdk'));</script>
 END_OF_FB_JS_SDK

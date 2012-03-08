@@ -1,6 +1,6 @@
 # -*- coding: utf-8; indent-tabs-mode: t; ruby-indent-level: 3; tab-width: 3 -*-
 #
-# Copyright (C) 2011  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2011-2012  Kouhei Sutou <kou@clear-code.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -38,7 +38,7 @@ end
 def section_footer_social_widgets_footer_scripts
 	<<-HTML
   <script type="text/javascript"
-          src="http://b.st-hatena.com/js/bookmark_button.js"
+          src="http://b.st-hatena.com/js/bookmark_button_wo_al.js"
           charset="utf-8"
           async="async"></script>
   <script type="text/javascript"

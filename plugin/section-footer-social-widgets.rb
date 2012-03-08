@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-facebook_use_iframe = true
+facebook_use_iframe = false
 
 add_header_proc do
 	tags = ""

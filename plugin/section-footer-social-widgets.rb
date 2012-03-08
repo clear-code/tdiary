@@ -15,6 +15,8 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+facebook_use_iframe = true
+
 add_header_proc do
 	tags = ""
   if @conf['social_widgets.facebook_user_id']
@@ -88,7 +90,8 @@ end
 
 add_section_leave_proc do |date, index|
 	date_ymd = date.strftime('%Y%m%d')
-	url = h("#{@conf.base_url}#{anchor(date_ymd)}")
+	unescaped_url = "#{@conf.base_url}#{anchor(date_ymd)}"
+	url = h(unescaped_url)
 	subtitle = @subtitles[date][index]
 	date_label = date.strftime('%Y-%m-%d')
 	entry_title = h("#{subtitle} - #{@html_title}(#{date_label})")
@@ -124,22 +127,65 @@ TWITTER_SHARE
 	  data-lang="ja">フォローする</a>
 </div>
 TWITTER_FOLLOW
-	widgets << <<-FACEBOOK_LIKE
+
+	facebook_like_parameters = {
+		:href => unescaped_url,
+		:send => "true",
+		:width => @conf["social_widgets.facebook_like_width"],
+		:show_faces => "true",
+	}
+	if facebook_use_iframe
+		html_parameters = facebook_like_parameters.collect do |key, value|
+			"#{h(key)}=#{h(value)}"
+		end.join("&amp;")
+		widgets << <<-FACEBOOK_LIKE
+<iframe src="//www.facebook.com/plugins/like.php?#{html_parameters}"
+        scrolling="no"
+        frameborder="0"
+        style="border:none;
+               overflow:hidden;
+               width:#{facebook_like_parameters[:width]}px;"
+        allowTransparency="true"></iframe>
+FACEBOOK_LIKE
+	else
+      attributes = facebook_like_parameters.collect do |key, value|
+			"data-#{key.to_s.gsub(/_/, '-')}=\"#{h(value)}\""
+		end.join("    \n")
+		widgets << <<-FACEBOOK_LIKE
 <div class="social-widget-facebook">
   <div class="fb-like"
-		 data-send="true"
-		 data-href="#{url}"
-		 data-width="#{@conf["social_widgets.facebook_like_width"]}"
-		 data-show-faces="true"></div>
+       #{attributes}></div>
 </div>
 FACEBOOK_LIKE
-	widgets << <<-FACEBOOK_COMMENTS
+	end
+
+	facebook_comments_parameters = {
+		:href => unescaped_url,
+		:width => @conf["social_widgets.facebook_comments_width"],
+	}
+	if facebook_use_iframe
+		html_parameters = facebook_comments_parameters.collect do |key, value|
+			"#{h(key)}=#{h(value)}"
+		end.join("&amp;")
+		widgets << <<-FACEBOOK_COMMENTS
+<iframe src="http://www.facebook.com/plugins/comments.php?#{html_parameters}"
+        scrolling="no"
+        frameborder="0"
+        style="border:none; overflow:hidden; width:#{facebook_comments_parameters[:width]}px;"
+        allowTransparency="true"></iframe>
+FACEBOOK_COMMENTS
+	else
+      attributes = facebook_like_parameters.collect do |key, value|
+			"data-#{key.to_s.gsub(/_/, '-')}=\"#{h(value)}\""
+		end.join("    \n")
+		widgets << <<-FACEBOOK_COMMENTS
 <div class="social-widget-facebook">
   <div class="fb-comments"
-		 data-href="#{url}"
-		 data-width="#{@conf["social_widgets.facebook_comments_width"]}"></div>
+		 #{attributes}></div>
 </div>
 FACEBOOK_COMMENTS
+	end
+
 	widgets << "</div>\n"
 	widgets
 end

@@ -40,7 +40,7 @@ end
 def section_footer_social_widgets_footer_scripts
 	<<-HTML
   <script type="text/javascript"
-          src="http://b.st-hatena.com/js/bookmark_button_wo_al.js"
+          src="http://b.st-hatena.com/js/bookmark_button.js"
           charset="utf-8"
           async="async"></script>
   <script type="text/javascript"

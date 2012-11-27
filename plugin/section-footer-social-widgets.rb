@@ -48,7 +48,6 @@ def section_footer_social_widgets_footer_scripts
           charset="utf-8"></script>
   <script src="http://platform.twitter.com/widgets.js"
           type="text/javascript"></script>
-  <script type="text/javascript" src="http://apis.google.com/js/plusone.js">
     {lang: 'ja'}
   </script>
    HTML
@@ -97,9 +96,6 @@ add_section_leave_proc do |date, index|
 	entry_title = h("#{subtitle} - #{@html_title}(#{date_label})")
 	widgets = "<div class=\"social-widgets\">\n"
 	widgets << "  <div class=\"inline-social-widgets\">\n"
-	widgets << <<-GOOGLE_PLUSONE
-<g:plusone href="#{url}" size="medium"></g:plusone>
-GOOGLE_PLUSONE
 	widgets << <<-HATENA
 <a href="http://b.hatena.ne.jp/entry/#{url}"
    class="hatena-bookmark-button"

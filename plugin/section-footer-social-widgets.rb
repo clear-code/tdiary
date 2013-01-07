@@ -47,7 +47,7 @@ def section_footer_social_widgets_footer_scripts
           src="http://b.hatena.ne.jp/js/widget.js"
           charset="utf-8"></script>
   <script src="http://platform.twitter.com/widgets.js"
-          type="text/javascript"></script>
+          type="text/javascript">
     {lang: 'ja'}
   </script>
    HTML

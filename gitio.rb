@@ -1,4 +1,4 @@
-# Copyright (C) 2008-2011  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2008-2013  Kouhei Sutou <kou@clear-code.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -28,6 +28,7 @@ module TDiary
 				Dir.chdir(@data_path) do
 					run( "git", "add", @dfile )
 					run( "git", "commit", "-m", "update #{date.strftime('%Y-%m-%d')}" )
+					run( "git", "push" )
 				end
 			end
 			result

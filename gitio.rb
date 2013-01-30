@@ -27,7 +27,7 @@ module TDiary
 			unless (dirty & TDiaryBase::DIRTY_DIARY).zero?
 				Dir.chdir(@data_path) do
 					run( "git", "add", @dfile )
-					run( "git", "commit", "-m", "update #{date.strftime('%Y-%m-%d')}" )
+					run( "git", "commit", "-m", "Update #{date.strftime('%Y-%m-%d')}" )
 					run( "git", "push" )
 				end
 			end

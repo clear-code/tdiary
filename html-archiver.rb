@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 # -*- coding: utf-8; ruby-indent-level: 3; tab-width: 3; indent-tabs-mode: t -*-
 #
-# Copyright (C) 2008-2011  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2008-2013  Kouhei Sutou <kou@clear-code.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -154,9 +154,9 @@ module HTMLArchiver
 				def category_anchor(category)
 					href = ::HTMLArchiver::Category.path(@conf, category)
 					if @category_icon[category] and !@conf.mobile_agent?
-						%Q|<a href="\#{href}"><img class="category" src="\#{h @category_icon_url}\#{h @category_icon[category]}" alt="\#{h category}"></a>|
+						%Q|<a href="\#{href}" title="\#{h category}"><img class="category" src="\#{h @category_icon_url}\#{h @category_icon[category]}" alt="\#{h category}"></a>|
 					else
-						%Q|[<a href="\#{href}">\#{h category}</a>]|
+						%Q|[<a href="\#{href}" title="\#{h category}">\#{h category}</a>]|
 					end
 				end
 

@@ -719,7 +719,8 @@ Dir.chdir(options.conf_dir) do
 	begin
 		original_program_name = $PROGRAM_NAME
 		$PROGRAM_NAME = File.basename($PROGRAM_NAME)
-		conf = TDiary::Config.new(cgi)
+		request = TDiary::Request.new({}, cgi)
+		conf = TDiary::Config.new(nil, request)
 	ensure
 		$PROGRAM_NAME = original_program_name
 	end

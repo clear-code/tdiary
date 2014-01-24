@@ -16,7 +16,7 @@
 require 'tdiary/io/default'
 
 module TDiary
-	class GitIO < DefaultIO
+	class GitIO < IO::Default
 		def transaction( date, &block )
 			dirty = TDiaryBase::DIRTY_NONE
 			result = super( date ) do |diaries|

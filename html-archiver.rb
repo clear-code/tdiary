@@ -689,8 +689,13 @@ EOH
 			js_dir = @dest + "js"
 			js_dir.rmtree if js_dir.exist?
 			js_dir.mkpath
-			tdiary_js_dir = Pathname(File.join(TDiary::PATH, "js"))
-			copy_recursive(tdiary_js_dir, js_dir)
+			tdiary_js_dirs = [
+				Pathname(File.join(TDiary::PATH, "js")),
+				Pathname(File.join(TDiary::PATH, "contrib", "js")),
+			]
+			tdiary_js_dirs.each do |tdiary_js_dir|
+				copy_recursive(tdiary_js_dir, js_dir)
+			end
 		end
 
 		def copy_recursive(source, destination)

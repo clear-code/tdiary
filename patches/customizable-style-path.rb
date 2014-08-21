@@ -1,21 +1,21 @@
 module TDiary
 	module IO
 		class Base
-		def load_styles_with_customizable_path
-			load_styles_without_customizable_path
-			paths = @tdiary.conf.options['style.path'] || []
-			paths = [paths] if paths.is_a?( String )
-			["#{TDiary::PATH}/tdiary", *paths].each do |path|
-				path = path.sub( /\/+$/, '' )
-				Dir::glob( "#{path}/**/*_style.rb" ) do |style_file|
-					require style_file.untaint
-					style = File::basename( style_file ).sub( /_style\.rb$/, '' )
-					@styles[style] ||= TDiary::const_get( "#{style.capitalize}Diary" )
+			def load_styles_with_customizable_path
+				load_styles_without_customizable_path
+				paths = @tdiary.conf.options['style.path'] || []
+				paths = [paths] if paths.is_a?( String )
+				["#{TDiary::PATH}/tdiary", *paths].each do |path|
+					path = path.sub( /\/+$/, '' )
+					Dir::glob( "#{path}/**/*_style.rb" ) do |style_file|
+						require style_file.untaint
+						style = File::basename( style_file ).sub( /_style\.rb$/, '' )
+						@styles[style] ||= TDiary::const_get( "#{style.capitalize}Diary" )
+					end
 				end
 			end
-		end
-		alias_method :load_styles_without_customizable_path, :load_styles
-		alias_method :load_styles, :load_styles_with_customizable_path
+			alias_method :load_styles_without_customizable_path, :load_styles
+			alias_method :load_styles, :load_styles_with_customizable_path
 		end
 	end
 end

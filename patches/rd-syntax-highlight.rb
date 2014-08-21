@@ -39,7 +39,7 @@ module TDiary
 					      :css => :style)
 		end
 
-		BaseIO.after_load_styles do |io|
+		IO::Base.after_load_styles do |io|
 			RD::RD2tDiaryVisitor.class_eval do
 				include TDiary::RDSyntaxHighlight
 			end

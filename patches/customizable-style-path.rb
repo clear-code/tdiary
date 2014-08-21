@@ -1,5 +1,6 @@
 module TDiary
-	class BaseIO
+	module IO
+		class Base
 		def load_styles_with_customizable_path
 			load_styles_without_customizable_path
 			paths = @tdiary.conf.options['style.path'] || []
@@ -15,6 +16,7 @@ module TDiary
 		end
 		alias_method :load_styles_without_customizable_path, :load_styles
 		alias_method :load_styles, :load_styles_with_customizable_path
+		end
 	end
 end
 

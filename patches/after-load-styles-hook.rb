@@ -14,7 +14,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 module TDiary
-	class BaseIO
+	module IO
+		class Base
 		@@after_load_styles_hooks = []
 		@@loaded_styles = false
 		class << self
@@ -33,6 +34,7 @@ module TDiary
 		end
 		alias_method :load_styles_without_after_hook, :load_styles
 		alias_method :load_styles, :load_styles_with_after_hook
+		end
 	end
 end
 

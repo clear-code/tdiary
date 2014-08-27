@@ -736,4 +736,6 @@ def conf.bot?; false; end
 output_dir ||= Pathname(conf.data_path) + "cache" + "html"
 output_dir = Pathname(output_dir).expand_path
 output_dir.mkpath
-HTMLArchiver::Main.new(cgi, output_dir, conf, options.conf_dir).run
+Dir.chdir(options.conf_dir) do
+	HTMLArchiver::Main.new(cgi, output_dir, conf, options.conf_dir).run
+end

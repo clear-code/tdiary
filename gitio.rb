@@ -1,4 +1,4 @@
-# Copyright (C) 2008-2013  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2008-2015  Kouhei Sutou <kou@clear-code.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+require 'pathname'
 require 'tdiary/io/default'
 
 module TDiary
@@ -26,7 +27,10 @@ module TDiary
 			end
 			unless (dirty & TDiaryBase::DIRTY_DIARY).zero?
 				Dir.chdir(@data_path) do
-					run( "git", "add", @dfile )
+					file_path = Pathname.new( @dfile )
+					data_dir_path = Pathname.new( @data_path )
+					relative_file_path = file_path.relative_path_from( data_dir_path )
+					run( "git", "add", relative_file_path.to_s )
 					run( "git", "commit", "-m", "Update #{date.strftime('%Y-%m-%d')}" )
 					run( "git", "push" )
 				end

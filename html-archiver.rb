@@ -48,6 +48,13 @@ output_dir = ARGV.shift
 $LOAD_PATH.unshift(File.expand_path(File.join(options.tdiary_path, "lib")))
 require "tdiary"
 
+class CGI
+	private
+	def env_table
+		{"REQUEST_METHOD" => "GET", "QUERY_STRING" => ""}
+	end
+end
+
 module HTMLArchiver
 	class CGI < ::CGI
 		def referer
@@ -56,11 +63,6 @@ module HTMLArchiver
 
 		def html_archiver?
 			true
-		end
-
-		private
-		def env_table
-			{"REQUEST_METHOD" => "GET", "QUERY_STRING" => ""}
 		end
 	end
 

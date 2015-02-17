@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 # -*- coding: utf-8; ruby-indent-level: 3; tab-width: 3; indent-tabs-mode: t -*-
 #
-# Copyright (C) 2008-2013  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2008-2015  Kouhei Sutou <kou@clear-code.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -45,7 +45,7 @@ opts.parse!
 
 output_dir = ARGV.shift
 
-$LOAD_PATH.unshift(File.expand_path(options.tdiary_path))
+$LOAD_PATH.unshift(File.expand_path(File.join(options.tdiary_path, "lib")))
 require "tdiary"
 
 module HTMLArchiver

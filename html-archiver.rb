@@ -676,7 +676,7 @@ EOH
 			theme_dir = @dest + "theme"
 			theme_dir.rmtree if theme_dir.exist?
 			theme_dir.mkpath
-			tdiary_theme_dir = Pathname(File.join(TDiary::PATH, "theme"))
+			tdiary_theme_dir = Pathname(File.join(TDiary.root, "theme"))
 			base_css = tdiary_theme_dir + "base.css"
 			dest_base_css = theme_dir + "base.css"
 			FileUtils.cp(base_css.to_s, dest_base_css.to_s)
@@ -692,8 +692,8 @@ EOH
 			js_dir.rmtree if js_dir.exist?
 			js_dir.mkpath
 			tdiary_js_dirs = [
-				Pathname(File.join(TDiary::PATH, "js")),
-				Pathname(File.join(TDiary::PATH, "contrib", "js")),
+				Pathname(File.join(TDiary.root, "js")),
+				Pathname(File.join(TDiary.root, "contrib", "js")),
 			]
 			tdiary_js_dirs.each do |tdiary_js_dir|
 				copy_recursive(tdiary_js_dir, js_dir)

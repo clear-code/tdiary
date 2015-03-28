@@ -195,6 +195,7 @@ module HTMLArchiver
 				<<-HTML5
 <!DOCTYPE html>
 <html lang="#{lang}">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 				HTML5
 			end
 			html5 = html5.sub(/<meta http-equiv="Content-Type" content="text\/html; charset=(.+?)">\n/) do

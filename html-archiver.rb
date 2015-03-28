@@ -197,6 +197,13 @@ module HTMLArchiver
 <html lang="#{lang}">
 EOH
 			end
+			html5 = html5.sub(/<meta http-equiv="Content-Type" content="text\/html; charset=(.+?)">/) do
+				charset = $1
+				<<-HTML
+		<meta charset="#{charset}">
+           HTML
+			end
+			html5
 		end
 
 		def set_last_modified?

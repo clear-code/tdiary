@@ -200,7 +200,7 @@ module HTMLArchiver
 			html5 = html5.sub(/<meta http-equiv="Content-Type" content="text\/html; charset=(.+?)">/) do
 				charset = $1
 				<<-HTML5
-		<meta charset="#{charset}">
+	<meta charset="#{charset}">
 				HTML5
 			end
 			html5

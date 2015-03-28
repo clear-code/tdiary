@@ -193,7 +193,7 @@ module HTMLArchiver
 			html5 = html.sub(/\A<!DOCTYPE.+?>\n<html lang="(.+?)">\n/) do
 				lang = $1
 				<<-EOH
-<!doctype html>
+<!DOCTYPE html>
 <html lang="#{lang}">
 EOH
 			end

@@ -190,11 +190,12 @@ module HTMLArchiver
 		end
 
 		def html_to_html5(html)
-			html5 = html.sub(/\A<!DOCTYPE.+?>\n<html (?:.+ )?lang="(.+?)">\n/) do
+			html5 = html.sub(/\A<!DOCTYPE.+?>\n<html (?:.+ )?lang="(.+?)">\n<head>\n/) do
 				lang = $1
 				<<-HTML5
 <!DOCTYPE html>
 <html lang="#{lang}">
+<head>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 				HTML5
 			end

@@ -190,7 +190,7 @@ module HTMLArchiver
 		end
 
 		def html_to_html5(html)
-			html5 = html.sub(/\A<!DOCTYPE.+?>\n<html lang="(.+?)">\n/) do
+			html5 = html.sub(/\A<!DOCTYPE.+?>\n<html (?:.+ )?lang="(.+?)">\n/) do
 				lang = $1
 				<<-EOH
 <!DOCTYPE html>

@@ -201,7 +201,7 @@ module HTMLArchiver
 				charset = $1
 				<<-HTML5
 		<meta charset="#{charset}">
-           HTML5
+				HTML5
 			end
 			html5
 		end

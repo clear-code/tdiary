@@ -1,6 +1,6 @@
 # -*- coding: utf-8; indent-tabs-mode: t; ruby-indent-level: 3; tab-width: 3 -*-
 #
-# Copyright (C) 2011-2012  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2011-2015  Kouhei Sutou <kou@clear-code.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -22,17 +22,17 @@ add_header_proc do
   if @conf['social_widgets.facebook_user_id']
     tags << <<-HTML
   <meta property="fb:admins"
-        content="#{h(@conf['social_widgets.facebook_user_id'])}" />
+        content="#{h(@conf['social_widgets.facebook_user_id'])}">
 	  HTML
   end
   if @conf['social_widgets.facebook_application_id']
     tags << <<-HTML
     <meta property="fb:app_id"
-          content="#{h(@conf['social_widgets.facebook_application_id'])}" />
+          content="#{h(@conf['social_widgets.facebook_application_id'])}">
 	  HTML
   end
   tags << <<-HTML
-  <meta property="og:locale" content="ja_JP" />
+  <meta property="og:locale" content="ja_JP">
 	HTML
   tags
 end
@@ -105,7 +105,7 @@ add_section_leave_proc do |date, index|
          width="20"
          height="20"
          style="border: none;"
-         alt="このエントリーをはてなブックマークに追加" /></a>
+         alt="このエントリーをはてなブックマークに追加"></a>
 HATENA
 	widgets << <<-TWITTER_SHARE
 <a href="http://twitter.com/share"

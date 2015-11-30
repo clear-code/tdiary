@@ -586,7 +586,7 @@ module HTMLArchiver
 			archive_categories
 			archive_latest(all_days)
 
- 			make_rss
+			make_rss
 			copy_theme
 			copy_js
 		end
@@ -610,10 +610,10 @@ module HTMLArchiver
 				@years[year].sort.each do |month|
 					month_time = Time.local(year.to_i, month.to_i)
 					month = Month.new(month_time, @dest, conf)
- 					month.save
+					month.save
 					month.send(:each_day) do |diary|
 						all_days << diary.date
- 						Day.new(diary, @dest, conf).save
+						Day.new(diary, @dest, conf).save
 					end
 				end
 			end
@@ -635,7 +635,7 @@ module HTMLArchiver
 					end
 				end
 				category = Category.new(name, categorized_diaries, @dest, conf)
- 				categories << category if category.save
+				categories << category if category.save
 			end
 
 			return if categories.empty?

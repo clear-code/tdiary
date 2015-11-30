@@ -705,7 +705,7 @@ module HTMLArchiver
 				Pathname(File.join(TDiary.root, "contrib", "js")),
 			]
 			tdiary_js_dirs.each do |tdiary_js_dir|
-				copy_recursive(tdiary_js_dir, js_dir)
+				copy_recursive(tdiary_js_dir, js_dir) if tdiary_js_dir.exist?
 			end
 		end
 

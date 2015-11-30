@@ -710,7 +710,6 @@ module HTMLArchiver
 		end
 
 		def copy_recursive(source, destination)
-			return unless source.exist?
 			destination.mkdir unless destination.exist?
 			source.each_entry do |entry|
 				next if entry.to_s == "." or entry.to_s == ".."

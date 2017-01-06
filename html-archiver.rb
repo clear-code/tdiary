@@ -622,17 +622,18 @@ module HTMLArchiver
 
 		def archive_categories
 			categories = []
-			cache = @plugin.instance_variable_get("@category_cache")
-			cache.recreate(@years)
-			cache.categorize([], @years).each do |name, diaries|
+			@plugin.__send__(:category_rebuild, @years)
+			target_categories = []
+			@plugin.__send__(:category_transaction, nil) do |_, name, ymd, _|
 				next if name.empty?
+				target_categories << [name, ymd]
+			end
+			target_categories.each do |name, ymd|
 				categorized_diaries = {}
-				diaries.keys.each do |date|
-					date_time = Time.local(*date.scan(/^(\d{4})(\d\d)(\d\d)$/)[0])
-					@io.transaction(date_time) do |diaries|
-						categorized_diaries[date] = diaries[date]
-						DIRTY_NONE
-					end
+				date_time = Time.local(*ymd.scan(/^(\d{4})(\d\d)(\d\d)$/)[0])
+				@io.transaction(date_time) do |real_diaries|
+					categorized_diaries[ymd] = real_diaries[ymd]
+					DIRTY_NONE
 				end
 				category = Category.new(name, categorized_diaries, @dest, conf)
 				categories << category if category.save

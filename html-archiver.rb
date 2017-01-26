@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 # -*- coding: utf-8; ruby-indent-level: 3; tab-width: 3; indent-tabs-mode: t -*-
 #
-# Copyright (C) 2008-2015  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2008-2017  Kouhei Sutou <kou@clear-code.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -711,7 +711,7 @@ module HTMLArchiver
 		end
 
 		def copy_recursive(source, destination)
-			destination.mkdir unless destination.exist?
+			destination.mkpath unless destination.exist?
 			source.each_entry do |entry|
 				next if entry.to_s == "." or entry.to_s == ".."
 				full_source_path = source + entry

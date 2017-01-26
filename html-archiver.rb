@@ -623,17 +623,20 @@ module HTMLArchiver
 		def archive_categories
 			categories = []
 			@plugin.__send__(:category_rebuild, @years)
-			target_categories = []
+			target_categories = {}
 			@plugin.__send__(:category_transaction, nil) do |_, name, ymd, _|
 				next if name.empty?
-				target_categories << [name, ymd]
+				target_categories[name] ||= []
+				target_categories[name] << ymd
 			end
-			target_categories.each do |name, ymd|
+			target_categories.each do |name, ymds|
 				categorized_diaries = {}
-				date_time = Time.local(*ymd.scan(/^(\d{4})(\d\d)(\d\d)$/)[0])
-				@io.transaction(date_time) do |real_diaries|
-					categorized_diaries[ymd] = real_diaries[ymd]
-					DIRTY_NONE
+				ymds.each do |ymd|
+					date_time = Time.local(*ymd.scan(/^(\d{4})(\d\d)(\d\d)$/)[0])
+					@io.transaction(date_time) do |real_diaries|
+						categorized_diaries[ymd] = real_diaries[ymd]
+						DIRTY_NONE
+					end
 				end
 				category = Category.new(name, categorized_diaries, @dest, conf)
 				categories << category if category.save

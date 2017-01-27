@@ -309,18 +309,15 @@ module HTMLArchiver
 			end
 		end
 
-		def initialize(category, diaries, dest, conf)
+		def initialize(category, index, diaries, dest, conf)
 			@category = category
-			diaries = diaries.reject {|date, diary| diary.nil? or !diary.visible?}
-			_, diary = diaries.sort_by {|date, diary| diary.last_modified}.last
-			@target_date = diary.date
+			@index = index
 			super("latest.rhtml", dest, conf)
 			@diaries = diaries
-			@diary = diary
 		end
 
 		def can_save?
-			not @diary.nil?
+			true
 		end
 
 		def output_directory
@@ -330,7 +327,13 @@ module HTMLArchiver
 		end
 
 		def output_filename
-			output_directory + "#{normalized_name}.html"
+			if @index.zero?
+				output_directory + "#{normalized_name}.html"
+			else
+				category_dir = output_directory + normalized_name
+				category_dir.mkpath
+				category_dir + "#{@index}.html"
+			end
 		end
 
 		def original_name
@@ -342,13 +345,10 @@ module HTMLArchiver
 		end
 
 		def relative_path
-			"../"
-		end
-
-		def latest(limit=5)
-			@diaries.keys.sort.reverse_each do |date|
-				diary = @diaries[date]
-				yield(diary)
+			if @index.zero?
+				"../"
+			else
+				"../../"
 			end
 		end
 
@@ -362,10 +362,17 @@ module HTMLArchiver
 			result
 		end
 
+		def latest(limit, &block)
+			@diaries.each_value(&block)
+		end
+
+		def mode
+			"latest"
+		end
+
 		protected
 		def setup_cgi(cgi, conf)
 			super
-			cgi.params["date"] = [@target_date.strftime("%Y%m")]
 			cgi.params["category"] = [@category]
 		end
 	end
@@ -629,17 +636,55 @@ module HTMLArchiver
 				target_categories[name] ||= []
 				target_categories[name] << ymd
 			end
+
+			limit = conf.latest_limit
 			target_categories.each do |name, ymds|
-				categorized_diaries = {}
+				all_categorized_diaries = {}
 				ymds.each do |ymd|
 					date_time = Time.local(*ymd.scan(/^(\d{4})(\d\d)(\d\d)$/)[0])
 					@io.transaction(date_time) do |real_diaries|
-						categorized_diaries[ymd] = real_diaries[ymd]
+						diary = real_diaries[ymd]
+						all_categorized_diaries[ymd] = diary if diary.visible?
 						DIRTY_NONE
 					end
 				end
-				category = Category.new(name, categorized_diaries, @dest, conf)
-				categories << category if category.save
+
+				conf["latest.path"] = {}
+				sorted_ymds = all_categorized_diaries.keys.sort.reverse
+				sorted_ymds.each_slice(limit).each_with_index do |chunked_ymds, i|
+					components = [
+						Category.directory_name,
+					]
+					if i.zero?
+						components << Category.normalize_name(conf, name) + ".html"
+					else
+						components << Category.normalize_name(conf, name)
+						components << "#{i}.html"
+					end
+					conf["latest.path"][chunked_ymds.first] = components.join("/")
+				end
+				sorted_ymds.each_slice(limit).each_with_index do |chunked_ymds, i|
+					chunked_categorized_diaries = {}
+					chunked_ymds.each do |ymd|
+						chunked_categorized_diaries[ymd] = all_categorized_diaries[ymd]
+					end
+					category = Category.new(name,
+													i,
+													chunked_ymds.first,
+													chunked_categorized_diaries,
+													@dest,
+													conf)
+					if i.zero?
+						conf["ndays.prev"] = nil
+					else
+						conf["ndays.prev"] = sorted_ymds[limit * (i - 1)]
+					end
+					conf["ndays.next"] = sorted_ymds[limit * (i + 1)]
+					category.save
+					categories << category if i.zero?
+					conf["ndays.prev"] = nil
+					conf["ndays.next"] = nil
+				end
 			end
 
 			return if categories.empty?

@@ -738,9 +738,10 @@ module HTMLArchiver
 			dest_base_css = theme_dir + "base.css"
 			FileUtils.cp(base_css.to_s, dest_base_css.to_s)
 			FileUtils.touch(dest_base_css.to_s, :mtime => base_css.mtime)
-			if @conf.theme
-				copy_recursive(tdiary_theme_dir + @conf.theme,
-									theme_dir + @conf.theme)
+			if @conf.theme and @conf.theme.start_with?("local/")
+				theme = @conf.theme.split("/", 2)[1]
+				copy_recursive(tdiary_theme_dir + theme,
+									theme_dir + theme)
 			end
 		end
 

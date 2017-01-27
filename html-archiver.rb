@@ -670,7 +670,6 @@ module HTMLArchiver
 					end
 					category = Category.new(name,
 													i,
-													chunked_ymds.first,
 													chunked_categorized_diaries,
 													@dest,
 													conf)

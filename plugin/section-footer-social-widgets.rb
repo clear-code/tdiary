@@ -40,13 +40,13 @@ end
 def section_footer_social_widgets_footer_scripts
 	<<-HTML
   <script type="text/javascript"
-          src="http://b.st-hatena.com/js/bookmark_button.js"
+          src="//b.st-hatena.com/js/bookmark_button.js"
           charset="utf-8"
           async="async"></script>
   <script type="text/javascript"
-          src="http://b.hatena.ne.jp/js/widget.js"
+          src="//b.hatena.ne.jp/js/widget.js"
           charset="utf-8"></script>
-  <script src="http://platform.twitter.com/widgets.js"
+  <script src="//platform.twitter.com/widgets.js"
           type="text/javascript">
     {lang: 'ja'}
   </script>
@@ -97,18 +97,18 @@ add_section_leave_proc do |date, index|
 	widgets = "<div class=\"social-widgets\">\n"
 	widgets << "  <div class=\"inline-social-widgets\">\n"
 	widgets << <<-HATENA
-<a href="http://b.hatena.ne.jp/entry/#{url}"
+<a href="//b.hatena.ne.jp/entry/#{url}"
    class="hatena-bookmark-button"
    data-hatena-bookmark-layout="standard"
    title="このエントリーをはてなブックマークに追加"
-   ><img src="http://b.st-hatena.com/images/entry-button/button-only.gif"
+   ><img src="//b.st-hatena.com/images/entry-button/button-only.gif"
          width="20"
          height="20"
          style="border: none;"
          alt="このエントリーをはてなブックマークに追加"></a>
 HATENA
 	widgets << <<-TWITTER_SHARE
-<a href="http://twitter.com/share"
+<a href="//twitter.com/share"
    class="twitter-share-button"
    data-lang="ja"
    data-url="#{url}"
@@ -118,7 +118,7 @@ TWITTER_SHARE
 	widgets << "  </div>\n"
 	widgets << <<-TWITTER_FOLLOW
 <div class="social-widget-twitter-follow">
-  <a href="http://twitter.com/#{h(@conf['twitter.user'])}"
+  <a href="//twitter.com/#{h(@conf['twitter.user'])}"
 	  class="twitter-follow-button"
 	  data-lang="ja">フォローする</a>
 </div>
@@ -164,7 +164,7 @@ FACEBOOK_LIKE
 			"#{h(key)}=#{h(value)}"
 		end.join("&amp;")
 		widgets << <<-FACEBOOK_COMMENTS
-<iframe src="http://www.facebook.com/plugins/comments.php?#{html_parameters}"
+<iframe src="//www.facebook.com/plugins/comments.php?#{html_parameters}"
         scrolling="no"
         frameborder="0"
         style="border:none; overflow:hidden; width:#{facebook_comments_parameters[:width]}px;"

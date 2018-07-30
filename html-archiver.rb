@@ -491,15 +491,14 @@ module HTMLArchiver
 			return if @conf.banner.nil?
 			return if @conf.banner.empty?
 
-			if /^http/ =~ @conf.banner
+			if @conf.banner.start_with?("http")
 				rdf_image = @conf.banner
 			else
 				rdf_image = base_uri + @conf.banner
 			end
 
-			maker.image.url = rdf_image
-			maker.image.title = @conf.html_title
-			maker.link = base_uri
+			image.url = rdf_image
+			image.title = @conf.html_title
 		end
 
 		def setup_item(item, diary, base_uri)

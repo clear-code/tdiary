@@ -105,7 +105,7 @@ add_section_leave_proc do |date, index|
 	widgets = "<div class=\"social-widgets\">\n"
 	widgets << "  <div class=\"inline-social-widgets\">\n"
 	widgets << <<-HATENA
-<a href="//b.hatena.ne.jp/entry/#{hatena_url}"
+<a href="http://b.hatena.ne.jp/entry/#{hatena_url}"
    class="hatena-bookmark-button"
    data-hatena-bookmark-layout="standard"
    title="このエントリーをはてなブックマークに追加"

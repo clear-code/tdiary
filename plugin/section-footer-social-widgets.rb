@@ -90,6 +90,14 @@ end
 add_section_leave_proc do |date, index|
 	date_ymd = date.strftime('%Y%m%d')
 	unescaped_url = "#{@conf.base_url}#{anchor(date_ymd)}"
+	case unescaped_url
+	when /\Ahttps:\/\//
+		hatena_url = h("s/#{$POSTMATCH}")
+	when /\Ahttp:\/\//
+		hatena_url = h("#{$POSTMATCH}")
+	else
+		hatena_url = h("")
+	end
 	url = h(unescaped_url)
 	subtitle = @subtitles[date][index]
 	date_label = date.strftime('%Y-%m-%d')
@@ -97,7 +105,7 @@ add_section_leave_proc do |date, index|
 	widgets = "<div class=\"social-widgets\">\n"
 	widgets << "  <div class=\"inline-social-widgets\">\n"
 	widgets << <<-HATENA
-<a href="//b.hatena.ne.jp/entry/#{url}"
+<a href="//b.hatena.ne.jp/entry/#{hatena_url}"
    class="hatena-bookmark-button"
    data-hatena-bookmark-layout="standard"
    title="このエントリーをはてなブックマークに追加"

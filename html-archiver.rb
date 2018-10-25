@@ -24,6 +24,8 @@ require 'optparse'
 require 'ostruct'
 require 'enumerator'
 require 'rss'
+require 'tmpdir'
+require 'groonga'
 
 options = OpenStruct.new
 options.tdiary_path = "./"
@@ -612,6 +614,7 @@ module HTMLArchiver
 
 		def archive_days
 			all_days = []
+			similar_articles_searcher = SimilarArticleSearcher.new(conf)
 			@years.keys.sort.each do |year|
 				@years[year].sort.each do |month|
 					month_time = Time.local(year.to_i, month.to_i)
@@ -623,6 +626,7 @@ module HTMLArchiver
 					end
 				end
 			end
+			similar_articles_searcher.destroy
 			all_days
 		end
 
@@ -775,6 +779,72 @@ module HTMLArchiver
 			end
 		end
 	end
+
+   class SimilarArticleSearcher
+     def initialize(conf)
+       @data_dir = Pathname(conf.data_path)
+       @tmpdir = Dir.mktmpdir
+       @db_path = Pathname(@tmpdir) + "db"
+       load
+     end
+
+     def destroy
+       FileUtils.remove_entry_secure @tmpdir
+     end
+
+     def similar_articles(key, count=5)
+       target_record = articles[key]
+       return [] unless target_record
+       content = target_record["content"]
+       records = articles.select do |record|
+         record["content"].similar_search(content)
+       end
+       records = records.sort(sort_conditions_by_score, :limit => count + 1)
+       records = records.select do |record|
+         record["_key"] != key
+       end
+       records = records.sort(sort_conditions_by_score, :limit => count)
+       records.collect do |record|
+         record["_key"]
+       end
+     end
+
+     private
+     def articles
+       return @articles if @article
+       prepare_tables
+       @articles = Groonga["Article"]
+     end
+
+     def sort_conditions_by_score
+       [{ :key => "_score", :order => :descending}]
+     end
+
+     def prepare_tables
+       Groonga::Database.create(:path => @db_path.to_s)
+       Groonga::Schema.define do |schema|
+         schema.create_table("Article", :type => :hash) do |table|
+           table.text("content")
+         end
+         schema.create_table("Terms", :type => :patricia_trie,
+                                      :normalizer => :NormalizerAuto,
+                                      :default_tokenizer => "TokenMecab") do |table|
+           table.index("Article.content")
+         end
+       end
+     end
+
+     def load
+       Pathname.glob("#{@data_dir.to_s}/**/*.td2").each do |file|
+         file.read.split(/^\.$/).each do |article|
+           matched_date = article.match(/Date:\s*(\d+)/)
+           next unless matched_date
+           date = matched_date[1]
+           articles.add(date, :content => article)
+         end
+       end
+     end
+   end
 end
 
 cgi = HTMLArchiver::CGI.new

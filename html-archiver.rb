@@ -260,7 +260,9 @@ module HTMLArchiver
 				end
 				html << "</ul>\n"
 			end
-			html
+			fix_link(html) do |link_attribute, prefix, link|
+				%Q[#{prefix}="#{relative_path}#{link}"]
+			end
 		end
 
 		private

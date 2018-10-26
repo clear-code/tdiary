@@ -243,6 +243,11 @@ module HTMLArchiver
 			"../../"
 		end
 
+		def eval_rhtml( prefix = '' )
+			prefix["similar_articles"] = @similar_articles_searcher(@target_date.strftime("%Y%m%d"))
+			super(prefix)
+		end
+
 		private
 		def output_component_dir
 			Pathname(@target_date.strftime("%Y")) + @target_date.month.to_s

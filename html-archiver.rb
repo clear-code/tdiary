@@ -245,14 +245,22 @@ module HTMLArchiver
 
 		def eval_rhtml(*args)
 			body = super
-			unless @similar_articles.empty?
-				body << "<ul>\n"
-				@similar_articles.each do |article|
-					body << "<li>#{article["title"]}</li>\n"
-				end
-				body << "</ul>\n"
-			end
+			body << links_to_similar_articles
 			body
+		end
+
+		def links_to_similar_articles
+			html = ''
+			unless @similar_articles.empty?
+				html << "<ul>\n"
+				@similar_articles.each do |article|
+					label = h(article["title"])
+					path = @plugin.anchor(article["_key"])
+					html << "<li><a href=\"#{path}\">#{label}</a></li>\n"
+				end
+				html << "</ul>\n"
+			end
+			html
 		end
 
 		private

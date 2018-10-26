@@ -222,7 +222,7 @@ module HTMLArchiver
 		def initialize(diary, dest, conf, similar_articles_searcher)
 			@target_date = diary.date
 			@target_diaries = {@target_date.strftime("%Y%m%d") => diary}
-			@similar_articles_searcher = similar_articles_searcher
+			@similar_articles = similar_articles_searcher.similar_articles(@target_date.strftime("%Y%m%d"))
 			super("day.rhtml", dest, conf)
 		end
 
@@ -243,10 +243,16 @@ module HTMLArchiver
 			"../../"
 		end
 
-		def eval_rhtml( prefix = '' )
-			similar_articles = @similar_articles_searcher(@target_date.strftime("%Y%m%d"))
-			prefix["similar_articles"] = similar_articles
-			super(prefix)
+		def eval_rhtml(*args)
+			body = super
+			unless @similar_articles.empty?
+				body << "<ul>\n"
+				@similar_articles.each do |article|
+					body << "<li>#{article["title"]}</li>\n"
+				end
+				body << "</ul>\n"
+			end
+			body
 		end
 
 		private
@@ -812,7 +818,7 @@ module HTMLArchiver
 			end
 			records = records.sort(sort_conditions_by_score, :limit => count)
 			records.collect do |record|
-				DateTime.parse(record.value.key["_key"])
+				record.value.key
 			end
 		end
 
@@ -829,6 +835,7 @@ module HTMLArchiver
 			Groonga::Database.create(:path => @db_path.to_s)
 			Groonga::Schema.define do |schema|
 				schema.create_table("Article", :type => :hash) do |table|
+					table.short_text("title")
 					table.text("content")
 				end
 				schema.create_table("Terms", :type => :patricia_trie,
@@ -846,7 +853,8 @@ module HTMLArchiver
 					matched_date = article.match(/Date:\s*(\d+)/)
 					next unless matched_date
 					date = matched_date[1]
-					articles.add(date, :content => article)
+					title = article.match(/^[=#] *(.+)$/)[1]
+					articles.add(date, :title => title, :content => article)
 				end
 			end
 		end

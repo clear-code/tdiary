@@ -244,14 +244,15 @@ module HTMLArchiver
 		end
 
 		def eval_rhtml(*args)
-			body = super
-			body << links_to_similar_articles
-			body
+			calendar_tag = '<div class="calendar">'
+			super.gsub(calendar_tag, "#{links_to_similar_articles}#{calendar_tag}")
 		end
 
 		def links_to_similar_articles
 			html = ''
 			unless @similar_articles.empty?
+				html << "<div class=\"adminmenu\">\n"
+				html << "<h3>関連記事</h3>\n"
 				html << "<ul>\n"
 				@similar_articles.each do |article|
 					label = h(article["title"])
@@ -259,6 +260,7 @@ module HTMLArchiver
 					html << "<li><a href=\"#{path}\">#{label}</a></li>\n"
 				end
 				html << "</ul>\n"
+				html << "</div>\n"
 			end
 			fix_link(html) do |link_attribute, prefix, link|
 				%Q[#{prefix}="#{relative_path}#{link}"]

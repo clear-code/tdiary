@@ -818,9 +818,7 @@ module HTMLArchiver
 
 		private
 		def articles
-			 return @articles if @article
-			 prepare_tables
-			 @articles = Groonga["Article"]
+			@articles ||= Groonga["Article"]
 		end
 
 		def sort_conditions_by_score

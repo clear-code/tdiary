@@ -812,7 +812,7 @@ module HTMLArchiver
 			end
 			records = records.sort(sort_conditions_by_score, :limit => count)
 			records.collect do |record|
-				DateTime.parse(record["_key"])
+				DateTime.parse(record.value.key["_key"])
 			end
 		end
 

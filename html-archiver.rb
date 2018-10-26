@@ -789,31 +789,31 @@ module HTMLArchiver
 
 	class SimilarArticleSearcher
 		def initialize(conf)
-			 @data_dir = Pathname(conf.data_path)
-			 @tmpdir = Dir.mktmpdir
-			 @db_path = Pathname(@tmpdir) + "db"
-			 load
+			@data_dir = Pathname(conf.data_path)
+			@tmpdir = Dir.mktmpdir
+			@db_path = Pathname(@tmpdir) + "db"
+			load
 		end
 
 		def destroy
-			 FileUtils.remove_entry_secure @tmpdir
+			FileUtils.remove_entry_secure @tmpdir
 		end
 
 		def similar_articles(key, count=5)
-			 target_record = articles[key]
-			 return [] unless target_record
-			 content = target_record["content"]
-			 records = articles.select do |record|
-				 record["content"].similar_search(content)
-			 end
-			 records = records.sort(sort_conditions_by_score, :limit => count + 1)
-			 records = records.select do |record|
-				 record["_key"] != key
-			 end
-			 records = records.sort(sort_conditions_by_score, :limit => count)
-			 records.collect do |record|
-				 record["_key"]
-			 end
+			target_record = articles[key]
+			return [] unless target_record
+			content = target_record["content"]
+			records = articles.select do |record|
+				record["content"].similar_search(content)
+			end
+			records = records.sort(sort_conditions_by_score, :limit => count + 1)
+			records = records.select do |record|
+				record["_key"] != key
+			end
+			records = records.sort(sort_conditions_by_score, :limit => count)
+			records.collect do |record|
+				DateTime.parse(record["_key"])
+			end
 		end
 
 		private
@@ -824,32 +824,33 @@ module HTMLArchiver
 		end
 
 		def sort_conditions_by_score
-			 [{ :key => "_score", :order => :descending}]
+			[{ :key => "_score", :order => :descending}]
 		end
 
 		def prepare_tables
-			 Groonga::Database.create(:path => @db_path.to_s)
-			 Groonga::Schema.define do |schema|
-				 schema.create_table("Article", :type => :hash) do |table|
-					 table.text("content")
-				 end
-				 schema.create_table("Terms", :type => :patricia_trie,
+			Groonga::Database.create(:path => @db_path.to_s)
+			Groonga::Schema.define do |schema|
+				schema.create_table("Article", :type => :hash) do |table|
+					table.text("content")
+				end
+				schema.create_table("Terms", :type => :patricia_trie,
 																			:normalizer => :NormalizerAuto,
 																			:default_tokenizer => "TokenMecab") do |table|
-					 table.index("Article.content")
-				 end
-			 end
+					table.index("Article.content")
+				end
+			end
 		end
 
 		def load
-			 Pathname.glob("#{@data_dir.to_s}/**/*.td2").each do |file|
-				 file.read.split(/^\.$/).each do |article|
-					 matched_date = article.match(/Date:\s*(\d+)/)
-					 next unless matched_date
-					 date = matched_date[1]
-					 articles.add(date, :content => article)
-				 end
-			 end
+			prepare_tables
+			Pathname.glob("#{@data_dir.to_s}/**/*.td2").each do |file|
+				file.read.split(/^\.$/).each do |article|
+					matched_date = article.match(/Date:\s*(\d+)/)
+					next unless matched_date
+					date = matched_date[1]
+					articles.add(date, :content => article)
+				end
+			end
 		end
 	end
 end

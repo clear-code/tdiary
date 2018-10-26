@@ -823,13 +823,13 @@ module HTMLArchiver
 				record["content"].similar_search(content)
 			end
 			records = records.sort(sort_conditions_by_score, :limit => count + 1)
-			records = records.select do |record|
-				record["_key"] != key
-			end
-			records = records.sort(sort_conditions_by_score, :limit => count)
-			records.collect do |record|
+			records = records.collect do |record|
 				record.value.key
 			end
+			records = records.reject do |record|
+				record["_key"] == key
+			end
+			records[0..(count-1)]
 		end
 
 		private

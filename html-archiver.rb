@@ -244,7 +244,8 @@ module HTMLArchiver
 		end
 
 		def eval_rhtml( prefix = '' )
-			prefix["similar_articles"] = @similar_articles_searcher(@target_date.strftime("%Y%m%d"))
+			similar_articles = @similar_articles_searcher(@target_date.strftime("%Y%m%d"))
+			prefix["similar_articles"] = similar_articles
 			super(prefix)
 		end
 

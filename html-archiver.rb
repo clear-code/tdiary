@@ -832,8 +832,8 @@ module HTMLArchiver
 					table.text("content")
 				end
 				schema.create_table("Terms", :type => :patricia_trie,
-																			:normalizer => :NormalizerAuto,
-																			:default_tokenizer => "TokenMecab") do |table|
+														:normalizer => :NormalizerAuto,
+														:default_tokenizer => "TokenMecab") do |table|
 					table.index("Article.content")
 				end
 			end

@@ -157,7 +157,7 @@ module HTMLArchiver
 
 				def category_anchor(category)
 					href = ::HTMLArchiver::Category.path(@conf, category)
-					if @category_icon and @category_icon[category] and !@conf.mobile_agent?
+					if @category_icon[category] and !@conf.mobile_agent?
 						%Q|<a href="\#{href}" title="\#{h category}"><img class="category" src="\#{h @category_icon_url}\#{h @category_icon[category]}" alt="\#{h category}"></a>|
 					else
 						%Q|[<a href="\#{href}" title="\#{h category}">\#{h category}</a>]|
@@ -595,14 +595,14 @@ module HTMLArchiver
 			archive_latest(all_days)
 
 			make_rss
-			#copy_theme
+			copy_theme
 			copy_js
 		end
 
 		private
 		def copy_images
 			image_src_dir = @plugin.instance_variable_get("@image_dir")
-			image_src_dir = Pathname(image_src_dir.to_s)
+			image_src_dir = Pathname(image_src_dir)
 			unless image_src_dir.absolute?
 				image_src_dir = Pathname(@src) + image_src_dir
 			end

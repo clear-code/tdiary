@@ -2,10 +2,10 @@
 
 add_section_leave_proc do |date, index|
 	searcher = @conf["similar_articles_searcher"]
-	return '' unless searcher
+	break '' unless searcher
 
 	articles = searcher.similar_articles(date.strftime("%Y%m%d"))
-	return '' if articles.empty?
+	break '' if articles.empty?
 
 	html = "<div class=\"similar-articles\">\n"
 	html << "<h3>関連記事</h3>\n"

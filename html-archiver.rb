@@ -590,9 +590,13 @@ module HTMLArchiver
 			load_plugins
 			copy_images
 
+			prepare_similar_articles
+
 			all_days = archive_days
 			archive_categories
 			archive_latest(all_days)
+
+			@similar_articles_searcher.destroy
 
 			make_rss
 			copy_theme
@@ -612,9 +616,8 @@ module HTMLArchiver
 			end
 		end
 
-		def archive_days
-			all_days = []
-			similar_articles_searcher = SimilarArticleSearcher.new(conf)
+		def prepare_similar_articles
+			@similar_articles_searcher = SimilarArticleSearcher.new(conf)
 			@years.keys.each do |year|
 				@years[year].each do |month|
 					month_time = Time.local(year.to_i, month.to_i)
@@ -622,12 +625,18 @@ module HTMLArchiver
 					month.send(:each_day) do |diary|
 						key = diary.date.strftime("%Y%m%d")
 						sections = diary.instance_variable_get(:@sections)
-						title = sections.first.instance_variable_get(:@subtitle)
-						similar_articles_searcher.update_title(key, title)
+						section = sections.first
+						title = section.instance_variable_get(:@subtitle)
+						body = section.instance_variable_get(:@body)
+						@similar_articles_searcher.add(key, :title => title, :content => body)
 					end
 				end
 			end
-			conf["similar_articles_searcher"] = similar_articles_searcher
+			conf["similar_articles_searcher"] = @similar_articles_searcher
+		end
+
+		def archive_days
+			all_days = []
 			@years.keys.sort.each do |year|
 				@years[year].sort.each do |month|
 					month_time = Time.local(year.to_i, month.to_i)
@@ -639,7 +648,6 @@ module HTMLArchiver
 					end
 				end
 			end
-			similar_articles_searcher.destroy
 			all_days
 		end
 
@@ -798,7 +806,7 @@ module HTMLArchiver
 			@data_dir = Pathname(conf.data_path)
 			@tmpdir = Dir.mktmpdir
 			@db_path = Pathname(@tmpdir) + "db"
-			load
+			prepare_tables
 		end
 
 		def destroy
@@ -822,8 +830,8 @@ module HTMLArchiver
 			records[0..(count-1)]
 		end
 
-		def update_title(key, title)
-			articles.add(key, :title => title)
+		def add(key, attributes = {})
+			articles.add(key, attributes)
 		end
 
 		private
@@ -846,18 +854,6 @@ module HTMLArchiver
 														:normalizer => :NormalizerAuto,
 														:default_tokenizer => "TokenMecab") do |table|
 					table.index("Article.content")
-				end
-			end
-		end
-
-		def load
-			prepare_tables
-			Pathname.glob("#{@data_dir.to_s}/**/*.td2").each do |file|
-				file.read.split(/^\.$/).each do |article|
-					matched_date = article.match(/Date:\s*(\d+)/)
-					next unless matched_date
-					date = matched_date[1]
-					articles.add(date, :content => article)
 				end
 			end
 		end

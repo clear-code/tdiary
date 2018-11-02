@@ -857,8 +857,7 @@ module HTMLArchiver
 					matched_date = article.match(/Date:\s*(\d+)/)
 					next unless matched_date
 					date = matched_date[1]
-					title = article.match(/^[=#] *(.+)$/)[1]
-					articles.add(date, :title => title, :content => article)
+					articles.add(date, :content => article)
 				end
 			end
 		end

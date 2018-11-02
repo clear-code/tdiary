@@ -615,6 +615,18 @@ module HTMLArchiver
 		def archive_days
 			all_days = []
 			similar_articles_searcher = SimilarArticleSearcher.new(conf)
+			@years.keys.each do |year|
+				@years[year].each do |month|
+					month_time = Time.local(year.to_i, month.to_i)
+					month = Month.new(month_time, @dest, conf)
+					month.send(:each_day) do |diary|
+						key = diary.date.strftime("%Y%m%d")
+						sections = diary.instance_variable_get(:@sections)
+						title = sections.first.instance_variable_get(:@subtitle)
+						similar_articles_searcher.update_title(key, title)
+					end
+				end
+			end
 			conf["similar_articles_searcher"] = similar_articles_searcher
 			@years.keys.sort.each do |year|
 				@years[year].sort.each do |month|
@@ -808,6 +820,10 @@ module HTMLArchiver
 				record["_key"] == key
 			end
 			records[0..(count-1)]
+		end
+
+		def update_title(key, title)
+			articles.add(key, :title => title)
 		end
 
 		private

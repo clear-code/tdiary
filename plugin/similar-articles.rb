@@ -8,7 +8,7 @@ add_section_leave_proc do |date, index|
 	next '' if articles.empty?
 
 	html = "<div class=\"similar-articles\">\n"
-	html << "<h3>関連記事</h3>\n"
+	html << "<h4>関連記事</h4>\n"
 	html << "<ul>\n"
 	articles.each do |article|
 		label = h(article["title"])

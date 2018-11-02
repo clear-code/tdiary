@@ -219,10 +219,9 @@ module HTMLArchiver
 	class Day < TDiary::TDiaryDay
 		include Base
 
-		def initialize(diary, dest, conf, similar_articles_searcher)
+		def initialize(diary, dest, conf)
 			@target_date = diary.date
 			@target_diaries = {@target_date.strftime("%Y%m%d") => diary}
-			conf["similar_articles"] = similar_articles_searcher.similar_articles(@target_date.strftime("%Y%m%d"))
 			super("day.rhtml", dest, conf)
 		end
 
@@ -616,6 +615,7 @@ module HTMLArchiver
 		def archive_days
 			all_days = []
 			similar_articles_searcher = SimilarArticleSearcher.new(conf)
+			conf["similar_articles_searcher"] = similar_articles_searcher
 			@years.keys.sort.each do |year|
 				@years[year].sort.each do |month|
 					month_time = Time.local(year.to_i, month.to_i)
@@ -623,7 +623,7 @@ module HTMLArchiver
 					month.save
 					month.send(:each_day) do |diary|
 						all_days << diary.date
-						Day.new(diary, @dest, conf, similar_articles_searcher).save
+						Day.new(diary, @dest, conf).save
 					end
 				end
 			end

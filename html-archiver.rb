@@ -226,6 +226,12 @@ module HTMLArchiver
 			super("day.rhtml", dest, conf)
 		end
 
+		def load_plugins
+		  plugin = super
+		  plugin.instance_variable_set(:@similar_articles, @similar_articles)
+		  plugin
+		end
+
 		def can_save?
 			not @diary.nil?
 		end
@@ -241,30 +247,6 @@ module HTMLArchiver
 
 		def relative_path
 			"../../"
-		end
-
-		def eval_rhtml(*args)
-			calendar_tag = '<div class="calendar">'
-			super.gsub(calendar_tag, "#{links_to_similar_articles}#{calendar_tag}")
-		end
-
-		def links_to_similar_articles
-			html = ''
-			unless @similar_articles.empty?
-				html << "<div class=\"adminmenu\">\n"
-				html << "<h3>関連記事</h3>\n"
-				html << "<ul>\n"
-				@similar_articles.each do |article|
-					label = h(article["title"])
-					path = @plugin.anchor(article["_key"])
-					html << "<li><a href=\"#{path}\">#{label}</a></li>\n"
-				end
-				html << "</ul>\n"
-				html << "</div>\n"
-			end
-			fix_link(html) do |link_attribute, prefix, link|
-				%Q[#{prefix}="#{relative_path}#{link}"]
-			end
 		end
 
 		private

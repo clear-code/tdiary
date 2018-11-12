@@ -13,7 +13,7 @@ add_section_leave_proc do |date, index|
 	articles.each do |article|
 		label = h(article["title"])
 		path = anchor(article["_key"])
-		html << "<li data-score=\"#{article["_score"]}\"><a href=\"#{path}\">#{label}</a></li>\n"
+		html << "<li><a href=\"#{path}\">#{label}</a></li>\n"
 	end
 	html << "</ul>\n"
 	html << "</div>\n"

@@ -821,13 +821,14 @@ module HTMLArchiver
 				record["content"].similar_search(content)
 			end
 			records = records.sort(sort_conditions_by_score, :limit => count + 1)
-			records = records.collect do |record|
-				record.value.key
-			end
 			records = records.reject do |record|
-				record["_key"] == key
+				record.value.key["_key"] == key
 			end
-			records[0..(count-1)]
+			articles = records.collect do |record|
+				{ :record => record.value.key,
+				  :score  => record["_score"] }
+			end
+			articles[0..(count-1)]
 		end
 
 		def add(key, attributes = {})

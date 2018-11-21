@@ -818,8 +818,8 @@ module HTMLArchiver
 			return [] unless target_record
 			content = target_record["content"]
 			records = articles.select do |record|
-				conditions = record["content"].similar_search(content)
-				conditions &= (record["_key"] != key)
+				condition = record["content"].similar_search(content)
+				condition & (record["_key"] != key)
 			end
 			records.sort(sort_conditions_by_score, :limit => count)
 		end

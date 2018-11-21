@@ -4,7 +4,7 @@ add_section_leave_proc do |date, index|
 	searcher = @conf["similar_articles_searcher"]
 	next '' unless searcher
 
-        source_date = date.strftime("%Y%m%d")
+	source_date = date.strftime("%Y%m%d")
 	articles = searcher.similar_articles(source_date)
 	next '' if articles.empty?
 

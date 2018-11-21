@@ -11,10 +11,9 @@ add_section_leave_proc do |date, index|
 	html << "<h4>関連記事</h4>\n"
 	html << "<ul>\n"
 	articles.each do |article|
-		record = article[:record]
-		label = h(record["title"])
-		path = anchor(record["_key"])
-		score = article[:score]
+		label = h(article["title"])
+		path = anchor(article["_key"])
+		score = article["_score"]
 		html << "<li data-score=\"#{score}\"><a href=\"#{path}\">#{label}</a></li>\n"
 	end
 	html << "</ul>\n"

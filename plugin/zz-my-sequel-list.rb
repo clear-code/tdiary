@@ -1,4 +1,9 @@
 
+@my_sequel_default_hash[:inner_css][:default] = <<'_END',
+font-size: medium;
+text-align: left;
+_END
+
 class MySequel
   def html(dst_anchor, date_format, label)
     anchors = srcs(dst_anchor)

@@ -1,8 +1,5 @@
-
-@my_sequel_default_hash[:inner_css][:default] = <<'_END',
-font-size: medium;
-text-align: left;
-_END
+@my_sequel_default_hash[:label][:default] = 'この記事の続き'
+@my_sequel_default_hash[:inner_css][:default] = 'font-size: medium; text-align: left;'
 
 class MySequel
   def html(dst_anchor, date_format, label)

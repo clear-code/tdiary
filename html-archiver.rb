@@ -828,6 +828,12 @@ module HTMLArchiver
 			articles.add(key, attributes)
 		end
 
+		def get_article_title(key)
+			target_record = articles[key]
+			return nil unless target_record
+			target_record["title"]
+		end
+
 		private
 		def articles
 			@articles ||= Groonga["Article"]

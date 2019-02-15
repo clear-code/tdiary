@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 add_section_leave_proc do |date, index|
-	searcher = @conf["similar_articles_searcher"]
+	searcher = @conf["articles_db"]
 	next '' unless searcher
 
 	source_date = date.strftime("%Y%m%d")

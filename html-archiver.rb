@@ -590,13 +590,13 @@ module HTMLArchiver
 			load_plugins
 			copy_images
 
-			prepare_similar_articles
+			prepare_articles_db
 
 			all_days = archive_days
 			archive_categories
 			archive_latest(all_days)
 
-			@similar_articles_searcher.destroy
+			@articles_db.destroy
 
 			make_rss
 			copy_theme
@@ -616,8 +616,8 @@ module HTMLArchiver
 			end
 		end
 
-		def prepare_similar_articles
-			@similar_articles_searcher = SimilarArticleSearcher.new(conf)
+		def prepare_articles_db
+			@articles_db = ArticlesDB.new(conf)
 			@years.keys.each do |year|
 				@years[year].each do |month|
 					month_time = Time.local(year.to_i, month.to_i)
@@ -628,11 +628,11 @@ module HTMLArchiver
 						section = sections.first
 						title = section.instance_variable_get(:@subtitle)
 						body = section.instance_variable_get(:@body)
-						@similar_articles_searcher.add(key, :title => title, :content => body)
+						@articles_db.add(key, :title => title, :content => body)
 					end
 				end
 			end
-			conf["similar_articles_searcher"] = @similar_articles_searcher
+			conf["articles_db"] = @articles_db
 		end
 
 		def archive_days
@@ -801,7 +801,7 @@ module HTMLArchiver
 		end
 	end
 
-	class SimilarArticleSearcher
+	class ArticlesDB
 		def initialize(conf)
 			@data_dir = Pathname(conf.data_path)
 			@tmpdir = Dir.mktmpdir
@@ -828,7 +828,7 @@ module HTMLArchiver
 			articles.add(key, attributes)
 		end
 
-		def get_article_title(key)
+		def title(key)
 			target_record = articles[key]
 			return nil unless target_record
 			target_record["title"]

@@ -63,9 +63,11 @@ def diary_title(date)
 end
 
 def navi_prev_diary(date)
-  h(diary_title(date))
+  h("前の記事: #{diary_title(date)}")
 end
 
 def navi_next_diary(date)
-  h(diary_title(date))
+  h("次の記事: #{diary_title(date)}")
 end
+
+def navi_latest; '最新記事'; end

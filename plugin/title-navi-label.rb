@@ -42,6 +42,11 @@ end
 
 def diary_title(date)
 	key = date.strftime("%Y%m%d")
+	searcher = @conf["similar_articles_searcher"]
+	if searcher
+	  article_title = searcher.get_article_title(key)
+	  return article_title if article_title
+	end
 	diary = @diaries[key]
 	diary ||= (@more_diaries || {})[key]
 	if diary

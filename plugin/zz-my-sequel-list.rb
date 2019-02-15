@@ -27,4 +27,5 @@ add_header_proc do
   if not(bot?) and @my_sequel
     @my_sequel.similar_articles_searcher = @conf["similar_articles_searcher"]
   end
+  ''
 end

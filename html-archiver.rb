@@ -626,9 +626,10 @@ module HTMLArchiver
 						key = diary.date.strftime("%Y%m%d")
 						sections = diary.instance_variable_get(:@sections)
 						section = sections.first
-						title = section.instance_variable_get(:@subtitle).sub(/^\s*(\[[^\]]+\]\s*)+/, "")
+						title = section.instance_variable_get(:@subtitle)
+						plain_title = title.sub(/^\s*(\[[^\]]+\]\s*)+/, "")
 						body = section.instance_variable_get(:@body)
-						@articles_db.add(key, :title => title, :content => body)
+						@articles_db.add(key, :title => plain_title, :content => "#{title}\n#{body}")
 					end
 				end
 			end

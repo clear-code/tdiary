@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 
 add_section_leave_proc do |date, index|
-	searcher = @conf["articles_db"]
-	next '' unless searcher
+	articles_db = @conf["articles_db"]
+	next '' unless articles_db
 
 	source_date = date.strftime("%Y%m%d")
-	articles = searcher.similar_articles(source_date)
+	articles = articles_db.similar_articles(source_date)
 	next '' if articles.empty?
 
 	html = "<div class=\"similar-articles\">\n"

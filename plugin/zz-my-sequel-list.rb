@@ -9,8 +9,8 @@ class MySequel
     if anchors and not anchors.empty? then
       r = %Q|<div class="sequel"><h4>#{h label}</h4><ul><li>|
       r += anchors.map{|src_anchor|
-        searcher = self.articles_db
-        article_title = searcher && searcher.title(src_anchor)
+        articles_db = self.articles_db
+        article_title = articles_db && articles_db.title(src_anchor)
         label = Time.local(*(src_anchor.scan(/(\d{4,4})(\d\d)(\d\d)/)[0])).strftime(date_format)
         label = "#{label}: #{article_title}" if article_title
         yield(src_anchor, label)

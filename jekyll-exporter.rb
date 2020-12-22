@@ -144,6 +144,10 @@ class RDParser
       case plugin_call.name
       when :image
         format_image(*plugin_call.args)
+      when :isbn_detail
+        format_isbn(*plugin_call.args)
+      when :bugzilla
+        format_bugzilla(*plugin_call.args)
       else
         "TODO: #{__method__}: #{plugin_call.name}"
       end
@@ -167,6 +171,14 @@ class RDParser
       else
         "![#{alt}]({{ \"#{image_url}\" | relative_url }} \"#{alt}\")"
       end
+    end
+
+    def format_isbn(isbn)
+      "https://amazon.co.jp/dp/#{isbn}"
+    end
+
+    def format_bugzilla(id)
+      "[#{id}](https://bugzilla.mozilla.org/show_bug.cgi?id=#{id})"
     end
 
     def apply_to_Emphasis(element, contents)

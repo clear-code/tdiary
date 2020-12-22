@@ -78,8 +78,12 @@ class RDParser
         headline = $POSTMATCH
       end
       headline = headline.strip
-      @title = headline if element.level == 1
-      "#{marks} #{headline}"
+      if element.level == 1
+        @title = headline
+        ""
+      else
+        "#{marks} #{headline}"
+      end
     end
 
     def apply_to_StringElement(element)

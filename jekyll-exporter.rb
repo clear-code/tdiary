@@ -158,13 +158,15 @@ class RDParser
 
     def format_image(index, alt, thumbnail_index, size=nil)
       image_url = resolve_image_url(index)
+      # TODO: Support size
       if thumbnail_index
         thumbnail_url = resolve_image_url(thumbnail_index)
+        "[" +
+          "![#{alt}]({{ \"#{thumbnail_url}\" | relative_url }} \"#{alt}\")" +
+          "]({{ \"#{image_url}\" | relative_url }})"
       else
-        thumbnail_url = image_url
+        "![#{alt}]({{ \"#{image_url}\" | relative_url }} \"#{alt}\")"
       end
-      # TODO: Support size
-      "[![#{alt}](#{thumbnail_url} \"#{alt}\")](#{image_url})"
     end
 
     def apply_to_Emphasis(element, contents)

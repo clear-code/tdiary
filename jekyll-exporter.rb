@@ -348,6 +348,7 @@ class JekyllExporter
     td2_paths.sort.each do |td2_path|
       File.open(td2_path) do |td2_file|
         parse_td2(td2_file) do |headers, body|
+          next unless headers["Visible"]
           parse_diary(headers, body)
         end
       end

@@ -21,41 +21,41 @@ require "cgi/util"
 require "date"
 require "fileutils"
 require "optparse"
-require "ostruct"
+require "pathname"
 require "yaml"
 
 require "rd/rdfmt"
 require "rd/rdvisitor"
 
-options = OpenStruct.new
-options.data_dir = "data"
-options.output_dir = "jekyll"
-opts = OptionParser.new do |opts|
-  opts.on("--data-dir=DIR",
-          "The directory that has tDiary data") do |dir|
-    options.data_dir = dir
-  end
-
-  opts.on("--output-dir=DIR",
-          "The directory that holds exported data") do |dir|
-    options.output_dir = dir
-  end
-end
-opts.parse!
-
 class RDParser
+  class PluginCall < BasicObject
+    attr_reader :name
+    attr_reader :args
+    def initialize(plugin_call)
+      instance_eval(plugin_call)
+    end
+
+    def method_missing(name, *args)
+      @name = name
+      @args = args
+    end
+  end
+
   class Visitor < RD::Visitor
-    def initialize
+    def initialize(context)
+      @context = context
       @title = nil
       @categories = []
+      @links = []
       @footnotes = []
       @foottexts = []
-      super
+      super()
     end
 
     def metadata
       {
         "categories" => @categories,
+        "links" => @links,
         "title" => @title,
       }
     end
@@ -74,18 +74,18 @@ class RDParser
 
     def apply_to_Headline(element, contents)
       marks = "#" * (element.level + 1)
-      title = contents.join("")
-      while /\A\[(.+?)\]/ =~ title
+      headline = contents.join("")
+      while /\A\[(.+?)\]/ =~ headline
         @categories << $1
-        title = $POSTMATCH
+        headline = $POSTMATCH
       end
-      @title = title.strip
-      "#{marks} #{@title}"
+      headline = headline.strip
+      @title = headline if element.level == 1
+      "#{marks} #{headline}"
     end
 
     def apply_to_StringElement(element)
-      # TODO: escape
-      element.content
+      escape(element.content)
     end
 
     def apply_to_Reference_with_RDLabel(element, contents)
@@ -103,7 +103,10 @@ class RDParser
           day = $3
           if option.nil?
             title = contents.join("").strip
-            "[#{title}]({% post_url #{year}-#{month}-#{day}-index %})"
+            date = "#{year}-#{month}-#{day}"
+            @links << date
+            id = "#{date}-index"
+            "[#{title}]({% post_url #{id} %})"
           else
             "TODO: #{__method__}: #{label}"
           end
@@ -138,7 +141,31 @@ class RDParser
     end
 
     def apply_to_Keyboard(element, contents)
-      "TODO: #{__method__}"
+      plugin_call = PluginCall.new(contents.join(""))
+      case plugin_call.name
+      when :image
+        format_image(*plugin_call.args)
+      else
+        "TODO: #{__method__}: #{plugin_call.name}"
+      end
+    end
+
+    def resolve_image_url(index)
+      image_path_glob = @context.date.strftime("%Y%m%d_#{index}.*")
+      image_path =
+        Pathname.glob(@context.images_output_dir + image_path_glob).first
+      "#{@context.images_path}/#{image_path.basename}"
+    end
+
+    def format_image(index, alt, thumbnail_index, size=nil)
+      image_url = resolve_image_url(index)
+      if thumbnail_index
+        thumbnail_url = resolve_image_url(thumbnail_index)
+      else
+        thumbnail_url = image_url
+      end
+      # TODO: Support size
+      "[![#{alt}](#{thumbnail_url} \"#{alt}\")](#{image_url})"
     end
 
     def apply_to_Emphasis(element, contents)
@@ -162,23 +189,26 @@ class RDParser
     end
 
     def apply_to_EnumList(element, contents)
-      "TODO: #{__method__}"
+      prepend(contents, "  ")
     end
 
     def apply_to_EnumListItem(element, contents)
-      "TODO: #{__method__}"
+      [
+        around(contents.first, "1. ", "\n"),
+        *prepend(contents[1..-1], "   "),
+      ]
     end
 
     def apply_to_DescList(element, contents)
-      "TODO: #{__method__}"
+      ["<dl>", *contents, "</dl>"]
     end
 
     def apply_to_DescListItem(element, term, description)
-      "TODO: #{__method__}"
+      [*term, "\n<dd>\n", *description, "\n</dd>\n"]
     end
 
     def apply_to_DescListItemTerm(element, contents)
-      "TODO: #{__method__}"
+      ["\n<dt>\n", *contents, "\n</dt>\n"]
     end
 
     def apply_to_Footnote(element, contents)
@@ -196,10 +226,21 @@ class RDParser
     end
 
     private
+    def escape(content)
+      content.gsub(/[{}]/x) do |text|
+        escaped_characters = text.codepoints.collect do |codepoint|
+          "&##{codepoint};"
+        end
+        escaped_characters.join("")
+      end
+    end
+
     def normalize_lanaguage(language)
       case language
-      when "glibc"
+      when "glibc", "C"
         "c"
+      when "xhtml"
+        "html"
       else
         language
       end
@@ -215,9 +256,21 @@ class RDParser
         "#{prefix}#{target}"
       end
     end
+
+    def around(target, prefix, postfix)
+      case target
+      when Array
+        target.collect do |t|
+          around(t, prefix, postfix)
+        end
+      else
+        "#{prefix}#{target}#{postfix}"
+      end
+    end
   end
 
-  def initialize(headers, body)
+  def initialize(context, headers, body)
+    @context = context
     @headers = headers
     @body = body
   end
@@ -225,21 +278,79 @@ class RDParser
   def parse
     source = "=begin\n#{@body}\n=end\n"
     tree = RD::RDTree.new(source)
-    visitor = Visitor.new
+    visitor = Visitor.new(@context)
     markdown = visitor.visit(tree)
     [visitor.metadata, markdown]
   end
 end
 
 class JekyllExporter
-  def initialize(data_dir, output_dir)
-    @data_dir = data_dir
-    @output_dir = output_dir
+  class Context
+    attr_accessor :date
+    attr_accessor :data_dir
+    attr_accessor :posts_output_dir
+    attr_accessor :images_output_dir
+    attr_accessor :images_path
+    def initialize
+      @date = nil
+      @data_dir = "data"
+      @posts_output_dir = "_posts"
+      @images_output_dir = "images/blog"
+      @images_path = "/images/blog"
+    end
   end
 
-  def export
-    FileUtils.mkdir_p(@output_dir)
-    td2_paths = Dir.glob(File.join(@data_dir, "????", "*.td2"))
+  def initialize
+    @context = Context.new
+    @diaries = {}
+    @inverted_post_links = {}
+  end
+
+  def export(args)
+    parse_args!(args)
+    export_images
+    export_posts
+  end
+
+  private
+  def parse_args!(args)
+    parser = OptionParser.new
+    parser.on("--data-dir=DIR",
+              "The directory that has tDiary data",
+              "(#{@context.data_dir})") do |dir|
+      @context.data_dir = dir
+    end
+    parser.on("--posts-output-dir=DIR",
+              "The directory that holds exported diaries",
+              "(#{@context.posts_output_dir})") do |dir|
+      @context.posts_output_dir = dir
+    end
+    parser.on("--images-output-dir=DIR",
+              "The directory that holds exported images",
+              "(#{@context.images_output_dir})") do |dir|
+      @context.images_output_dir = dir
+    end
+    parser.on("--images-path=PATH",
+              "The path that refers exported images",
+              "(#{@context.images_path})") do |path|
+      @context.images_path = path
+    end
+    parser.parse!(args)
+  end
+
+  def export_images
+    images_dir = Pathname.new(File.join(@context.data_dir, "images"))
+    Pathname.glob(images_dir + "**" + "*.*") do |image_path|
+      relative_image_path = image_path.relative_path_from(images_dir)
+      output_image_path =
+        Pathname.new(@context.images_output_dir) + relative_image_path
+      FileUtils.mkdir_p(output_image_path.parent.to_s)
+      FileUtils.cp(image_path.to_s, output_image_path.to_s)
+    end
+  end
+
+  def export_posts
+    td2_paths = Dir.glob(File.join(@context.data_dir, "????", "*.td2"))
     td2_paths.sort.each do |td2_path|
       File.open(td2_path) do |td2_file|
         parse_td2(td2_file) do |headers, body|
@@ -247,9 +358,25 @@ class JekyllExporter
         end
       end
     end
+
+    FileUtils.mkdir_p(@context.posts_output_dir)
+    @diaries.each do |date, diary|
+      id = diary[:id]
+      metadata = diary[:metadata]
+      markdown = diary[:markdown]
+      next_posts = @inverted_post_links[date]
+      metadata["next_posts"] = next_posts if next_posts
+      output_path = File.join(@context.posts_output_dir, "#{id}.md")
+      File.open(output_path, "w") do |output|
+        output.puts(<<-JEKYLL_MARKDOWN)
+#{metadata.to_yaml.strip}
+---
+#{markdown.strip}
+        JEKYLL_MARKDOWN
+      end
+    end
   end
 
-  private
   def parse_td2(td2_file)
     first_line = td2_file.gets.chomp
     unless first_line == "TDIARY2.01.00"
@@ -294,6 +421,7 @@ class JekyllExporter
   end
 
   def parse_diary(headers, body)
+    @context.date = headers["Date"]
     case headers["Format"]
     when "RD"
       metadata, markdown = parse_diary_rd(headers, body)
@@ -302,18 +430,24 @@ class JekyllExporter
     end
     date = headers["Date"].strftime("%Y-%m-%d")
     slug = metadata["slug"] || "index"
-    output_path = File.join(@output_dir, "#{date}-#{slug}.md")
-    File.open(output_path, "w") do |output|
-      output.puts(<<-JEKYLL_MARKDOWN)
-#{metadata.to_yaml.strip}
----
-#{markdown.strip}
-      JEKYLL_MARKDOWN
+    id = "#{date}-#{slug}"
+    @diaries[date] = {
+      id: id,
+      headers: headers,
+      metadata: metadata,
+      markdown: markdown
+    }
+    (metadata["links"] || []).each do |link_date|
+      @inverted_post_links[link_date] ||= []
+      @inverted_post_links[link_date] << {
+        "id" => id,
+        "title" => metadata["title"],
+      }
     end
   end
 
   def parse_diary_rd(headers, body)
-    parser = RDParser.new(headers, body)
+    parser = RDParser.new(@context, headers, body)
     parser.parse
   end
 
@@ -322,5 +456,5 @@ class JekyllExporter
   end
 end
 
-exporter = JekyllExporter.new(options.data_dir, options.output_dir)
-exporter.export
+exporter = JekyllExporter.new
+exporter.export(ARGV)

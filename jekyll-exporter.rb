@@ -46,7 +46,6 @@ class RDParser
       @context = context
       @title = nil
       @categories = []
-      @links = []
       @footnotes = []
       @foottexts = []
       super()
@@ -55,7 +54,6 @@ class RDParser
     def metadata
       {
         "categories" => @categories,
-        "links" => @links,
         "title" => @title,
       }
     end
@@ -103,10 +101,7 @@ class RDParser
           day = $3
           if option.nil?
             title = contents.join("").strip
-            date = "#{year}-#{month}-#{day}"
-            @links << date
-            id = "#{date}-index"
-            "[#{title}]({% post_url #{id} %})"
+            "[#{title}]({% post_url #{year}-#{month}-#{day}-index %})"
           else
             "TODO: #{__method__}: #{label}"
           end
@@ -303,7 +298,6 @@ class JekyllExporter
   def initialize
     @context = Context.new
     @diaries = {}
-    @inverted_post_links = {}
   end
 
   def export(args)
@@ -364,8 +358,6 @@ class JekyllExporter
       id = diary[:id]
       metadata = diary[:metadata]
       markdown = diary[:markdown]
-      next_posts = @inverted_post_links[date]
-      metadata["next_posts"] = next_posts if next_posts
       output_path = File.join(@context.posts_output_dir, "#{id}.md")
       File.open(output_path, "w") do |output|
         output.puts(<<-JEKYLL_MARKDOWN)
@@ -437,13 +429,6 @@ class JekyllExporter
       metadata: metadata,
       markdown: markdown
     }
-    (metadata["links"] || []).each do |link_date|
-      @inverted_post_links[link_date] ||= []
-      @inverted_post_links[link_date] << {
-        "id" => id,
-        "title" => metadata["title"],
-      }
-    end
   end
 
   def parse_diary_rd(headers, body)

@@ -99,6 +99,8 @@ class RDParser
         case prefix
         when "wikipedia"
           "[#{option}](https://ja.wikipedia.org/wiki/#{CGI.escape(option)})"
+        when "wikipedia-en"
+          "[#{option}](https://en.wikipedia.org/wiki/#{CGI.escape(option)})"
         when /\A(\d{4})(\d{2})(\d{2})\z/
           year = $1
           month = $2
@@ -128,7 +130,12 @@ class RDParser
 
     def apply_to_Verbatim(element)
       case element.content.first.chomp
-      when /\A# source:\s*(.+?)\z/
+      when /\A#\s*html\z/
+        return element.content[1..-1].join("")
+      when /\A#\s*html-demo\z/
+        language = "html"
+        content = element.content[1..-1].join("")
+      when /\A#\s*source:\s*(.+?)\z/
         language = $1
         content = element.content[1..-1].join("")
       else
@@ -144,12 +151,20 @@ class RDParser
       case plugin_call.name
       when :image
         format_image(*plugin_call.args)
-      when :isbn_detail
+      when :isbn, :isbn_detail
         format_isbn(*plugin_call.args)
       when :bugzilla
         format_bugzilla(*plugin_call.args)
+      when :youtube_div
+        format_youtube(*plugin_call.args)
+      when :nicovideo
+        format_nicovideo(*plugin_call.args)
+      when :ustream
+        ""
+      when :bq
+        format_block_quote(*plugin_call.args)
       else
-        "TODO: #{__method__}: #{plugin_call.name}"
+        "TODO: #{__method__}: #{plugin_call.name} #{plugin_call.args.inspect}"
       end
     end
 
@@ -173,24 +188,75 @@ class RDParser
       end
     end
 
-    def format_isbn(isbn)
-      "https://amazon.co.jp/dp/#{isbn}"
+    def format_isbn(isbn, label=nil)
+      url = "https://amazon.co.jp/dp/#{isbn}"
+      "[#{label || url}](#{url})"
     end
 
     def format_bugzilla(id)
       "[#{id}](https://bugzilla.mozilla.org/show_bug.cgi?id=#{id})"
     end
 
+    def format_youtube(id)
+      <<-HTML
+<div class="youtube-4x3">
+  <iframe width="425"
+          height="350"
+          src="https://www.youtube.com/embed/#{id}"
+          frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen></iframe>
+</div>
+      HTML
+    end
+
+    def format_nicovideo(id)
+      <<-HTML
+<div class="nicovideo-thumbnail">
+  <iframe width="312"
+          height="176"
+          src="https://ext.nicovideo.jp/thumb/#{id}"
+          scrolling="no"
+          style="border:solid 1px #ccc;"
+          frameborder="0"></iframe>
+</div>
+      HTML
+    end
+
+    def format_block_quote(source, title=nil, url=nil)
+      markdown = source.gsub(/^/, "> ")
+      if url or title
+        markdown << "\n"
+        markdown << "<p class=\"source\">\n"
+        markdown << "  <cite>"
+        if url
+          markdown << "<a href=\"#{CGI.escapeHTML(url)}\">"
+        end
+        if title
+          markdown << CGI.escape(title)
+        end
+        if url
+          markdown << "</a>"
+        end
+        markdown << "</cite>\n"
+        markdown << "</p>"
+        markdown << "\n"
+      end
+      markdown
+    end
+
     def apply_to_Emphasis(element, contents)
-      "TODO: #{__method__}"
+      content = contents.join("")
+      "*#{content}*"
     end
 
     def apply_to_Var(element, contents)
-      "TODO: #{__method__}"
+      variable = contents.join("")
+      "<var>#{CGI.escapeHTML(variable)}</var>"
     end
 
     def apply_to_Index(element, contents)
-      "TODO: #{__method__}"
+      contents
     end
 
     def apply_to_ItemList(element, contents)
@@ -217,11 +283,19 @@ class RDParser
     end
 
     def apply_to_DescListItem(element, term, description)
-      [*term, "\n<dd>\n", *description, "\n</dd>\n"]
+      [*term, "<dd>", *description, "</dd>"].inject(["\n"]) do |result, item|
+        result << item
+        result << "\n"
+        result
+      end
     end
 
     def apply_to_DescListItemTerm(element, contents)
-      ["\n<dt>\n", *contents, "\n</dt>\n"]
+      ["<dt>", *contents, "</dt>"].inject(["\n"]) do |result, item|
+        result << item
+        result << "\n"
+        result
+      end
     end
 
     def apply_to_Footnote(element, contents)
@@ -254,6 +328,8 @@ class RDParser
         "c"
       when "xhtml"
         "html"
+      when "Makefile"
+        "makefile"
       else
         language
       end

@@ -559,7 +559,7 @@ class MarkdownParser
         else
           # XXX: Ad-hoc fix
           if t.start_with?("```")
-            t.gsub(/^/) {"#{deeper_level_prefix}"}
+            t.gsub(/^/) {"#{deeper_level_prefix}  "}
           else
             "#{one_level_prefix}#{t}"
           end
@@ -573,7 +573,7 @@ class MarkdownParser
   def visit_list(node, contents)
     case node.list_type
     when :bullet_list
-      contents.collect {|content| prepend_one_level(content, "  * ", "    ")}
+      contents.collect {|content| prepend_one_level(content, "  * ", "  ")}
     when :ordered_list
       contents.collect {|content| prepend_one_level(content, "  1. ", "   ")}
     else
